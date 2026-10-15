@@ -8,6 +8,10 @@ for(const name of ['index.html','src','vendor','assets'])fs.cpSync(path.join(roo
 let html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 html=html.replace('<link rel="stylesheet" href="src/style.css">','<style>'+fs.readFileSync(path.join(root,'src/style.css'),'utf8')+'</style>');
 html=html.replace(/<script src="([^"]+)"><\/script>/g,(_,f)=>'<script>'+fs.readFileSync(path.join(root,f),'utf8').replace(/<\/script/gi,'<\\/script')+'</script>');
-for(const name of ['naidan','naidou'])html=html.replaceAll('assets/'+name+'.png','data:image/png;base64,'+fs.readFileSync(path.join(root,'assets',name+'.png')).toString('base64'));
+for(const name of ['naidan','naidou']){
+  const url='data:image/png;base64,'+fs.readFileSync(path.join(root,'assets',name+'.png')).toString('base64');
+  // Inline relative runtime references, leaving the absolute social-preview URL intact.
+  html=html.replace(new RegExp('([\'\"])assets/'+name+'\\.png\\1','g'),(_,quote)=>quote+url+quote);
+}
 fs.writeFileSync(path.join(root,'../奶蛙造车记-离线试玩.html'),html);
 console.log('Built dist/ and standalone offline HTML. No network dependency.');
