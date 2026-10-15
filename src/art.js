@@ -22,13 +22,23 @@ window.NaiArt=(()=>{
    c.restore();c.lineCap='round';c.lineJoin='round';c.strokeStyle='#476d42';c.lineWidth=13;c.beginPath();c.moveTo(x1,y1+6);c.lineTo(x2,y2+6);c.stroke();c.strokeStyle='#8fb962';c.lineWidth=9;c.beginPath();c.moveTo(x1,y1+2);c.lineTo(x2,y2+2);c.stroke();c.strokeStyle='#bdcf7c';c.lineWidth=2;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();
    for(let x=x1+18;x<x2-8;x+=31){const y=y1+(y2-y1)*(x-x1)/(x2-x1);c.strokeStyle='#668e48';c.lineWidth=1.4;c.beginPath();c.moveTo(x-3,y+3);c.lineTo(x-5,y-4);c.moveTo(x,y+2);c.lineTo(x+2,y-5);c.stroke();if(Math.floor(x/31)%5===0){c.fillStyle='#fff0ae';c.beginPath();c.arc(x+2,y-6,2,0,7);c.fill();}}
   }
-  for(const [x1,y1,x2,y2] of l.platforms||[]){c.save();c.translate(x1,y1);c.rotate(Math.atan2(y2-y1,x2-x1));const len=Math.hypot(x2-x1,y2-y1);rr(c,0,0,len,22,2,'#ad8353','#624f36');for(let x=8;x<len;x+=20){c.strokeStyle='#684e33';c.beginPath();c.moveTo(x,1);c.lineTo(x-2,20);c.stroke();}c.strokeStyle='#98794e';c.lineWidth=3;c.beginPath();c.moveTo(0,0);c.lineTo(0,-32);c.lineTo(len,-32);c.lineTo(len,0);c.stroke();c.restore();}
+  for(const [x1,y1,x2,y2] of l.platforms||[]){
+   c.save();c.translate(x1,y1);c.rotate(Math.atan2(y2-y1,x2-x1));const len=Math.hypot(x2-x1,y2-y1);
+   if(l.trackStyle==='switchback'){
+    rr(c,0,0,len,22,1,'#9a9975','#566c48');
+    for(let x=6;x<len-8;x+=33){c.fillStyle='#d6cba268';c.beginPath();c.moveTo(x,8);c.lineTo(Math.min(x+25,len),6);c.lineTo(Math.min(x+22,len),20);c.lineTo(x+4,18);c.fill();}
+    c.strokeStyle='#4d7641';c.lineWidth=7;c.beginPath();c.moveTo(0,2);c.lineTo(len,2);c.stroke();c.strokeStyle='#a9c970';c.lineWidth=3;c.beginPath();c.moveTo(0,0);c.lineTo(len,0);c.stroke();
+    for(let x=16;x<len-5;x+=45){c.strokeStyle='#75994f';c.lineWidth=1.5;c.beginPath();c.moveTo(x,0);c.lineTo(x-3,-6);c.moveTo(x,0);c.lineTo(x+3,-4);c.stroke();}
+   }else{rr(c,0,0,len,22,2,'#ad8353','#624f36');for(let x=8;x<len;x+=20){c.strokeStyle='#684e33';c.beginPath();c.moveTo(x,1);c.lineTo(x-2,20);c.stroke();}c.strokeStyle='#98794e';c.lineWidth=3;c.beginPath();c.moveTo(0,0);c.lineTo(0,-32);c.lineTo(len,-32);c.lineTo(len,0);c.stroke();}
+   c.restore();
+  }
   for(const o of l.obstacles||[])rr(c,o.x-o.w/2,o.y-o.h/2,o.w,o.h,5,'#89987b','#4c674d');
   const g=l.goal; c.strokeStyle='#f8f2c5';c.lineWidth=5;c.beginPath();c.moveTo(g.x-50,g.y);c.lineTo(g.x-50,g.y-120);c.moveTo(g.x+50,g.y);c.lineTo(g.x+50,g.y-120);c.stroke();
   for(let i=0;i<10;i++)for(let j=0;j<2;j++){c.fillStyle=(i+j)%2?'#4c6a53':'#fff7d6';c.fillRect(g.x-50+i*10,g.y-120+j*10,10,10);}
   c.fillStyle='#fcf5d1';c.font='bold 13px sans-serif';c.textAlign='center';c.fillText('一起到家',g.x,g.y-132);c.textAlign='left';
   house(c,g.x+100,g.y);sign(c,l.spawn.x-35,l.spawn.groundY,'出发 →');
   if(l.rocketWindow)sign(c,l.rocketWindow[0],430,'点火 ↑');
+  for(const s of l.routeSigns||[])sign(c,s.x,s.y,s.text);
   if(l.theme==='river'){sign(c,700,385,'断桥！');sign(c,850,620,'谷底也能走 →');}
   // Small scenery follows the ground profile, never disguises a collision.
   for(let i=0;i<l.segments.length;i+=2){const [x1,y1,x2,y2]=l.segments[i],x=x2-32,y=y2-2;if(x>l.spawn.x+210&&x<g.x-80){c.fillStyle='#648a4d';c.beginPath();c.ellipse(x,y-8,16,10,0,0,7);c.ellipse(x+18,y-6,12,8,0,0,7);c.fill();c.fillStyle='#ded9aa';c.fillRect(x+6,y-13,4,13);c.fillStyle='#c78c69';c.beginPath();c.ellipse(x+8,y-14,9,5,0,Math.PI,7);c.fill();}}

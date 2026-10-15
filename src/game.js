@@ -1,5 +1,5 @@
 /*
- * 《奶蛙造车记》V0.3.3 场景拼装版 — based on supplied prototype
+ * 《奶蛙造车记》V0.3.4 场景拼装版 — based on supplied prototype
  * Local Matter.js 0.20; character sprites derived from user supplied references.
  * Goal: an editable blueprint + a physically-driven test cart.
  */
@@ -31,8 +31,8 @@
   function resize(){const width=canvas.clientWidth,height=canvas.clientHeight;if(!width||!height)return;H=W*height/width;canvas.width=Math.round(width*Math.min(devicePixelRatio||1,2));canvas.height=Math.round(height*Math.min(devicePixelRatio||1,2));ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);}
   window.addEventListener('resize',resize);resize();
   new ResizeObserver(resize).observe(canvas);
-  let levelIndex = 0, blueprint = structuredClone(levels[0].example||data.blueprint), state = 'build';
-  let selectedPart = 'wood', selectedRotation = 0;
+  let levelIndex = 0, blueprint = NaiPhysics.emptyBlueprint(), state = 'build';
+  let selectedPart = 'cockpit', selectedRotation = 0;
   let engine = null, car = null, wheelBodies = [], groundBodies = [], goalBody = null;
   let cameraX = 0, last = 0, accumulator = 0, now = 0, fuel = 1, fanOn = false;
   let sim = null, history = [], future = [], scores = {}, muted = false, audio = null;
@@ -42,6 +42,7 @@
 
   try { starProgress=JSON.parse(localStorage.getItem('naiwa-stars-v032')||'{}');if(!starProgress||typeof starProgress!=='object')starProgress={};scores=Object.fromEntries(Object.entries(starProgress).map(([k,v])=>[k,Array.isArray(v)?v.filter(Boolean).length:0])); muted=localStorage.getItem('naiwa-muted')==='true'; }catch(_){}
   try { unlocked = Math.max(1, Number(JSON.parse(localStorage.getItem(STORAGE) || '{}').unlocked) || 1); } catch (_) {}
+  try {if(localStorage.getItem('naiwa-map2-revision')!=='switchback-v1'){delete starProgress[1];delete scores[1];localStorage.setItem('naiwa-stars-v032',JSON.stringify(starProgress));localStorage.setItem('naiwa-map2-revision','switchback-v1');}}catch(_){}
 
   function info(msg) { status = msg; $('statusText').textContent = msg; }
   function inventory() { return levels[levelIndex].inventory; }
@@ -49,7 +50,7 @@
   function countType(t) { return blueprint.parts.filter(p => p.type === t).length; }
   function occupancy() {
     const grid = Array(GRID_W * GRID_H).fill(null);
-    for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++)
+    if(blueprint.cockpit)for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++)
       grid[(blueprint.cockpit.y + dy)*GRID_W + blueprint.cockpit.x + dx] = blueprint.cockpit;
     for (const p of blueprint.parts) if (p.x >= 0 && p.x < GRID_W && p.y >= 0 && p.y < GRID_H)
       grid[p.y * GRID_W + p.x] = p;
@@ -57,7 +58,7 @@
   }
   function isLocked(cellX, cellY) {
     const c = blueprint.cockpit;
-    return cellX >= c.x && cellX < c.x+2 && cellY >= c.y && cellY < c.y+2;
+    return !!c && cellX >= c.x && cellX < c.x+2 && cellY >= c.y && cellY < c.y+2;
   }
   function validate() { return NaiPhysics.validate(blueprint,inventory(),parts); }
   function remember(){history.push(structuredClone(blueprint));if(history.length>60)history.shift();future=[];}
@@ -87,13 +88,14 @@
   }
   function drawPartList() {
     const host=$('parts'); host.replaceChildren();
-    for(const t of ['wood','wheel','motor','fan','balloon','rocket','cockpit','erase']) {
+    for(const t of ['cockpit','wood','wheel','motor','fan','balloon','rocket','erase']) {
       const available=inventory()[t]||0;
       const b=document.createElement('button');
       b.type='button';b.className=selectedPart===t?'active':'';
-      b.textContent=t==='cockpit'?'移动双人舱':t==='erase'?'⌫ 拆除':`${parts[t].name} ${available-countType(t)}`;
+      b.textContent=t==='cockpit'?(blueprint.cockpit?'移动双人舱':'奶蛋 & 奶豆'):t==='erase'?'⌫ 拆除':`${parts[t].name} ${available-countType(t)}`;
       b.dataset.part=t; b.title=t==='erase'?'点击已装零件拆除':t==='cockpit'?'点击新的左上角位置':`${partName(t)}：剩余 ${available-countType(t)}`;
-      b.draggable=!['erase','cockpit'].includes(t);b.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',JSON.stringify({type:t})));
+      b.draggable=t!=='erase';b.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',JSON.stringify({type:t})));
+      if(t==='cockpit'&&!blueprint.cockpit){const icons=document.createElement('span');icons.className='waitingFriends';for(const name of ['naidan','naidou']){const img=document.createElement('img');img.src=name==='naidan'?'assets/naidan.png':'assets/naidou.png';img.alt=name==='naidan'?'奶蛋':'奶豆';icons.appendChild(img);}b.prepend(icons);b.classList.add('unplaced');}
       if(!['erase','cockpit'].includes(t)){const icon=document.createElement('canvas');icon.width=60;icon.height=50;const ic=icon.getContext('2d');ic.translate(30,26);ic.scale(1.1,1.1);NaiArt.part(ic,{type:t,rotation:0},0,0);b.prepend(icon);}
       b.disabled=!['erase','cockpit'].includes(t)&&available===0;
       b.addEventListener('click',()=>{selectedPart=t;$('selection').textContent=`当前：${t==='erase'?'拆除':partName(t)}；方向 ${selectedRotation*90}°`;drawPartList();});
@@ -102,8 +104,12 @@
   }
   function putPart(x,y) {
     if(state!=='build')return;
-    if(selectedPart==='cockpit'){movePiece(blueprint.cockpit.x,blueprint.cockpit.y,x,y);return;}
-    if(isLocked(x,y)){ $('buildWarning').textContent='双人舱不可拆除，可选择「移动双人舱」重新放置';return;}
+    if(selectedPart==='cockpit'){
+      if(blueprint.cockpit){movePiece(blueprint.cockpit.x,blueprint.cockpit.y,x,y);return;}
+      if(x>3||y>2||blueprint.parts.some(p=>p.x>=x&&p.x<x+2&&p.y>=y&&p.y<y+2)){$('buildWarning').textContent='双人舱需要连续的 2×2 空格';return;}
+      remember();blueprint.cockpit={id:'cockpit-1',type:'cockpit',x,y,width:2,height:2,rotation:0,passengers:['naidan','naidou']};tone(480,.05);drawGrid();return;
+    }
+    if(isLocked(x,y)){if(selectedPart==='erase'){remember();blueprint.cockpit=null;drawGrid();}else $('buildWarning').textContent='这里是双人舱，可移动或用拆除收回';return;}
     remember();tone(380,.04);
     const occupying=blueprint.parts.find(p=>p.x===x&&p.y===y);
     if(occupying) {
@@ -124,16 +130,16 @@
     if(x<0||y<0||x+w>5||y+h>4||blueprint.parts.some(p=>p!==target&&p.x>=x&&p.x<x+w&&p.y>=y&&p.y<y+h)||(!cabin&&isLocked(x,y))){$('buildWarning').textContent='这里放不下，先拆除占用的零件';return;}
     remember();target.x=x;target.y=y;drawGrid();
   }
-  function resetBlueprint() { remember();blueprint=structuredClone(levels[levelIndex].example||data.blueprint); selectedRotation=0;drawGrid(); }
+  function resetBlueprint() { remember();blueprint=NaiPhysics.emptyBlueprint();selectedPart='cockpit';selectedRotation=0;$('rotateBtn').textContent='旋转 0°';drawGrid(); }
   function saveBlueprint() {
-    const error=validate();if(error){$('buildWarning').textContent='请先修好蓝图：'+error;return;}
+    const error=NaiPhysics.validate(blueprint,inventory(),parts,true);if(error){$('buildWarning').textContent=error;return;}
     try{localStorage.setItem('naiwa-car-blueprint-'+levelIndex,JSON.stringify(blueprint));$('buildWarning').textContent='蓝图已保存至浏览器';}
     catch(e){$('buildWarning').textContent='保存失败：本浏览器可能禁用了本地存储';}
   }
   function loadBlueprint() {
     try{const raw=localStorage.getItem('naiwa-car-blueprint-'+levelIndex);if(!raw)throw Error('还没有已保存的蓝图');
-      const b=JSON.parse(raw);if(!b||b.grid?.columns!==5||b.grid?.rows!==4||!Array.isArray(b.parts)||b.cockpit?.passengers?.length!==2)throw Error('存档格式不正确');
-      const error=NaiPhysics.validate(b,inventory(),parts);if(error)throw Error(error);remember();blueprint=b;drawGrid();
+      const b=JSON.parse(raw);if(!b||b.grid?.columns!==5||b.grid?.rows!==4||!Array.isArray(b.parts))throw Error('存档格式不正确');
+      const error=NaiPhysics.validate(b,inventory(),parts,true);if(error)throw Error(error);remember();blueprint=b;drawGrid();
     }catch(e){$('buildWarning').textContent=e.message;}
   }
   function makeWorld() { if(engine){Events.off(engine);World.clear(engine.world,false);Engine.clear(engine);} }
@@ -188,7 +194,7 @@
     for(let i=0;i<levels.length;i++){const o=document.createElement('option');o.value=i;o.textContent=`${i+1} · ${levels[i].name}${scores[i]?' '+ '★'.repeat(scores[i]):i+1>unlocked?' 🔒':''}`;o.disabled=i+1>unlocked;select.appendChild(o)}
     select.value=levelIndex;
   }
-  function changeLevel(i){overview=false;autoDrive=false;levelIndex=Math.min(Math.max(i,0),levels.length-1);blueprint=structuredClone(levels[levelIndex].example||data.blueprint);history=[];future=[];state='build';cameraX=0;car=null;sim=null;$('modal').classList.add('hidden');resetControls();setVisibleState();drawGrid();info('准备造车');refreshSelect();beginIntro();}
+  function changeLevel(i){overview=false;autoDrive=false;levelIndex=Math.min(Math.max(i,0),levels.length-1);blueprint=NaiPhysics.emptyBlueprint();selectedPart='cockpit';selectedRotation=0;$('rotateBtn').textContent='旋转 0°';history=[];future=[];state='build';cameraX=0;car=null;sim=null;$('modal').classList.add('hidden');resetControls();setVisibleState();drawGrid();info('准备造车');refreshSelect();beginIntro();}
   function tick(){
     if(state!=='test'||!sim)return;
     sim.step({...controls,right:controls.right||(autoDrive&&!controls.left&&!controls.brake),fan:fanOn});elapsed=sim.time;fuel=sim.fuel;
@@ -198,7 +204,10 @@
     const p=sim.cabin.position;
     if(!overview){cameraX=Math.max(-20,Math.min(levels[levelIndex].worldWidth-W/zoom+60,cameraX+(p.x-W/zoom*.32-cameraX)*.07));cameraY+=(p.y-(H-110)/zoom*.57-cameraY)*.07;}
     $('fuelBar').style.width=`${Math.round(fuel*100)}%`;
-    if(Math.floor(elapsed*10)!==Math.floor((elapsed-NaiPhysics.STEP/1000)*10))$('statusText').textContent=`奶蛋 ✓  奶豆 ✓  ·  ${elapsed.toFixed(1)} 秒  ·  距终点 ${Math.max(0,Math.round((levels[levelIndex].goal.x-p.x)/10))} 米  ·  ${starMarks(sim.collected)}`;
+    if(Math.floor(elapsed*10)!==Math.floor((elapsed-NaiPhysics.STEP/1000)*10)){
+      const route=levels[levelIndex].trackStyle==='switchback'?(p.y<330?'上层 →':p.y<525?'中层 ← 请向左':'谷底 → 请向右'):`距终点 ${Math.max(0,Math.round((levels[levelIndex].goal.x-p.x)/10))} 米`;
+      $('statusText').textContent=`奶蛋 ✓  奶豆 ✓  ·  ${elapsed.toFixed(1)} 秒  ·  ${route}  ·  ${starMarks(sim.collected)}`;
+    }
   }
   function roundedRect(x,y,w,h,r,fill,stroke=null){
     ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}
@@ -227,10 +236,10 @@
     NaiArt.cabin(ctx,sim.cabin.position.x,sim.cabin.position.y,c.angle,sim.motion);
     for(const w of sim.wheels)NaiArt.part(ctx,{type:'wheel'},w.position.x,w.position.y,w.angle);
   }
-  function buildOrigin(){const l=levels[levelIndex],b=blueprint,bottom=Math.max((b.cockpit.y+2)*34,...b.parts.map(p=>(p.y+1)*34));return {x:l.spawn.x,y:l.spawn.groundY-bottom-5};}
+  function buildOrigin(){const l=levels[levelIndex];return {x:l.spawn.x,y:l.spawn.groundY-GRID_H*TILE-5};}
   function drawBuildPreview(){
     const o=buildOrigin();for(const p of blueprint.parts)NaiArt.part(ctx,p,o.x+(p.x+.5)*34,o.y+(p.y+.5)*34);
-    NaiArt.cabin(ctx,o.x+(blueprint.cockpit.x+1)*34,o.y+(blueprint.cockpit.y+1)*34,0);
+    if(blueprint.cockpit)NaiArt.cabin(ctx,o.x+(blueprint.cockpit.x+1)*34,o.y+(blueprint.cockpit.y+1)*34,0);
   }
   function buildPose(){const l=levels[levelIndex],z=Math.max(1.5,45*W/(canvas.clientWidth*TILE)),top=canvas.clientHeight<280?29:62;return {x:l.spawn.x-100,y:canvas.clientHeight<500?buildOrigin().y-(top*W/canvas.clientWidth)/z:l.spawn.groundY-(H-125)/z,z};}
   function starMarks(mask){return [0,1,2].map(i=>mask?.[i]?'★':'☆').join('');}

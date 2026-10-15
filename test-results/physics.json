@@ -1,7 +1,7 @@
 {
   "engine": "Matter.js 0.20.0",
   "fixedStepHz": 120,
-  "passed": 28,
+  "passed": 31,
   "results": [
     {
       "level": 1,
@@ -72,8 +72,8 @@
     },
     {
       "level": 2,
-      "seconds": 9.025,
-      "axleError": 0.00505,
+      "seconds": 16.233,
+      "axleError": 0.02824,
       "candy": true,
       "blueprint": {
         "version": 1,
@@ -227,8 +227,8 @@
     },
     {
       "level": 4,
-      "seconds": 2.733,
-      "axleError": 0.00756,
+      "seconds": 2.483,
+      "axleError": 0.00086,
       "candy": true,
       "blueprint": {
         "version": 1,
@@ -396,6 +396,18 @@
     },
     {
       "name": "Valley recovery route on level 3 is also solvable",
+      "status": "PASS"
+    },
+    {
+      "name": "Empty workshop is a savable draft, never a playable prebuilt vehicle",
+      "status": "PASS"
+    },
+    {
+      "name": "Draft save accepts unfinished design but rejects invalid placements",
+      "status": "PASS"
+    },
+    {
+      "name": "Second map requires reversal and all three stacked roads are used",
       "status": "PASS"
     },
     {

@@ -9,19 +9,23 @@
   const {Engine,Bodies,Body,Composite,Constraint,Vertices}=M;
   const TILE=34, STEP=1000/120;
   const copy=x=>JSON.parse(JSON.stringify(x));
-  function validate(b,inventory,types){
+  function emptyBlueprint(){return {version:1,grid:{columns:5,rows:4},cockpit:null,parts:[]};}
+  function validate(b,inventory,types,draft=false){
     if(!b||b.grid?.columns!==5||b.grid?.rows!==4||!Array.isArray(b.parts))return '蓝图格式不正确';
     const c=b.cockpit;
-    if(!c||c.passengers?.join(',')!=='naidan,naidou')return '双人舱必须同时容纳奶蛋与奶豆';
-    if(!Number.isInteger(c.x)||!Number.isInteger(c.y)||c.x<0||c.x>3||c.y<0||c.y>2)return '双人舱必须完整放在网格内';
+    if(c!==null&&(!c||typeof c!=='object'||Array.isArray(c)))return '双人舱数据不正确';
+    if(!c&&!draft)return '先从零件栏放入奶蛋和奶豆的双人舱';
+    if(c&&c.passengers?.join(',')!=='naidan,naidou')return '双人舱必须同时容纳奶蛋与奶豆';
+    if(c&&(!Number.isInteger(c.x)||!Number.isInteger(c.y)||c.x<0||c.x>3||c.y<0||c.y>2))return '双人舱必须完整放在网格内';
     const cells=new Map(),frame=new Set(),counts={};
-    for(let y=c.y;y<c.y+2;y++)for(let x=c.x;x<c.x+2;x++){cells.set(`${x},${y}`,'cockpit');frame.add(`${x},${y}`);}
+    if(c)for(let y=c.y;y<c.y+2;y++)for(let x=c.x;x<c.x+2;x++){cells.set(`${x},${y}`,'cockpit');frame.add(`${x},${y}`);}
     for(const p of b.parts){
       if(!types[p.type]||p.type==='cockpit'||!Number.isInteger(p.x)||!Number.isInteger(p.y)||p.x<0||p.x>4||p.y<0||p.y>3||!Number.isInteger(p.rotation)||p.rotation<0||p.rotation>3)return '存在无效零件、方向或坐标';
       const k=`${p.x},${p.y}`;if(cells.has(k))return '零件不能重叠';cells.set(k,p.type);
       if(p.type!=='wheel')frame.add(k);counts[p.type]=(counts[p.type]||0)+1;
     }
     for(const [t,n] of Object.entries(counts))if(n>(inventory[t]||0))return `${types[t].name}超出本关库存`;
+    if(draft)return '';
     const q=[[c.x,c.y]],seen=new Set([`${c.x},${c.y}`]);
     for(let i=0;i<q.length;i++)for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
       const x=q[i][0]+dx,y=q[i][1]+dy,k=`${x},${y}`;if(frame.has(k)&&!seen.has(k)){seen.add(k);q.push([x,y]);}
@@ -99,5 +103,5 @@
       if(this.status==='test'&&this.passengers.join(',')==='naidan,naidou'&&this.cabin.vertices.every(v=>v.x>=g.x-75&&v.x<=g.x+75&&v.y>=g.y-140&&v.y<=g.y+30))this.status='success';
     }
   }
-  return {Simulation,validate,terrain,STEP};
+  return {Simulation,validate,emptyBlueprint,terrain,STEP};
 });

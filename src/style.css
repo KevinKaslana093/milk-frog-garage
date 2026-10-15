@@ -60,3 +60,8 @@ html{min-height:100%;background:#263f35}body{min-height:100vh;min-height:100dvh}
  .start{height:50px;bottom:9px}.selection,.warning{bottom:65px;font-size:9px}
  .homeCard{padding:6px 28px}.homeFriends{height:150px}.homeFriends img{height:120px}.homeFriends img+img{height:140px}
 }
+.waitingFriends{position:absolute;top:3px;left:0;right:0;display:flex;justify-content:center;align-items:end;height:42px;pointer-events:none}
+.waitingFriends img{height:40px;width:32px;object-fit:contain}
+.partList button[data-part=cockpit].unplaced{padding:46px 3px 4px;font-size:11px}
+@media(max-height:530px), (orientation:portrait) and (max-width:900px){.waitingFriends{height:33px}.waitingFriends img{height:32px;width:26px}.partList button[data-part=cockpit].unplaced{padding:36px 2px 3px;font-size:9px}}
+@media(orientation:portrait) and (max-width:350px){.waitingFriends{height:28px}.waitingFriends img{height:27px;width:22px}.partList button[data-part=cockpit].unplaced{padding-top:30px;font-size:8px}}
