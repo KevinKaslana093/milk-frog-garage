@@ -4,6 +4,10 @@ const data={};for(const [k,f] of [['parts','parts.json'],['blueprint','starter_b
 fs.writeFileSync(path.join(root,'src/data.js'),'/* Generated from data/*.json. */\nwindow.NAIWA_CONFIG = '+JSON.stringify(data,null,2)+';\n');
 fs.mkdirSync(dist,{recursive:true});
 for(const name of ['index.html','src','vendor','assets'])fs.cpSync(path.join(root,name),path.join(dist,name),{recursive:true});
+// Keep a new release from mixing its HTML with cached code from the previous release.
+const release=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version;
+const publishedHtml=fs.readFileSync(path.join(root,'index.html'),'utf8').replace(/((?:src|href)="(?:src\/|vendor\/)[^"?]+)(")/g,(_,url,quote)=>url+'?v='+release+quote);
+fs.writeFileSync(path.join(dist,'index.html'),publishedHtml);
 // Single HTML is a convenience build for offline play, including both original-reference sprites.
 let html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 html=html.replace('<link rel="stylesheet" href="src/style.css">','<style>'+fs.readFileSync(path.join(root,'src/style.css'),'utf8')+'</style>');
