@@ -1,0 +1,95 @@
+{
+  "units": "Matter.js 0.20, 120Hz fixed-step; see tests and release report",
+  "tileSize": 34,
+  "grid": {
+    "columns": 5,
+    "rows": 4
+  },
+  "types": [
+    {
+      "id": "wood",
+      "name": "木框",
+      "icon": "▣",
+      "size": [
+        1,
+        1
+      ],
+      "density": 0.0018,
+      "rotatable": false
+    },
+    {
+      "id": "wheel",
+      "name": "轮子",
+      "icon": "◉",
+      "size": [
+        1,
+        1
+      ],
+      "radius": 17,
+      "density": 0.0021,
+      "rotatable": false
+    },
+    {
+      "id": "motor",
+      "name": "发动机",
+      "icon": "⚙",
+      "size": [
+        1,
+        1
+      ],
+      "density": 0.0026,
+      "rotatable": false,
+      "torque": 0.24,
+      "maxSpeed": 0.34
+    },
+    {
+      "id": "fan",
+      "name": "风扇",
+      "icon": "✣",
+      "size": [
+        1,
+        1
+      ],
+      "density": 0.0018,
+      "rotatable": true,
+      "thrust": 0.01
+    },
+    {
+      "id": "balloon",
+      "name": "气球",
+      "icon": "♧",
+      "size": [
+        1,
+        1
+      ],
+      "density": 0.0008,
+      "rotatable": false,
+      "lift": 0.0078
+    },
+    {
+      "id": "rocket",
+      "name": "火箭",
+      "icon": "➤",
+      "size": [
+        1,
+        1
+      ],
+      "density": 0.0025,
+      "rotatable": true,
+      "thrust": 0.025,
+      "fuelMs": 2600
+    },
+    {
+      "id": "cockpit",
+      "name": "奶蛋奶豆双人舱",
+      "icon": "☻☻",
+      "size": [
+        2,
+        2
+      ],
+      "density": 0.0019,
+      "rotatable": false,
+      "required": true
+    }
+  ]
+}

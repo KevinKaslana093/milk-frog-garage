@@ -1,0 +1,12 @@
+{
+  "version":1,
+  "grid":{"columns":5,"rows":4},
+  "cockpit":{"id":"cockpit-1","type":"cockpit","x":1,"y":0,"width":2,"height":2,"rotation":0,"passengers":["naidan","naidou"]},
+  "parts":[
+    {"id":"wood-1","type":"wood","x":1,"y":2,"rotation":0},
+    {"id":"wood-2","type":"wood","x":2,"y":2,"rotation":0},
+    {"id":"wheel-1","type":"wheel","x":0,"y":2,"rotation":0},
+    {"id":"wheel-2","type":"wheel","x":3,"y":2,"rotation":0},
+    {"id":"motor-1","type":"motor","x":3,"y":1,"rotation":0}
+  ]
+}

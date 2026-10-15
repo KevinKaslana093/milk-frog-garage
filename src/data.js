@@ -1,0 +1,1089 @@
+/* Generated from data/*.json. */
+window.NAIWA_CONFIG = {
+  "parts": {
+    "units": "Matter.js 0.20, 120Hz fixed-step; see tests and release report",
+    "tileSize": 34,
+    "grid": {
+      "columns": 5,
+      "rows": 4
+    },
+    "types": [
+      {
+        "id": "wood",
+        "name": "木框",
+        "icon": "▣",
+        "size": [
+          1,
+          1
+        ],
+        "density": 0.0018,
+        "rotatable": false
+      },
+      {
+        "id": "wheel",
+        "name": "轮子",
+        "icon": "◉",
+        "size": [
+          1,
+          1
+        ],
+        "radius": 17,
+        "density": 0.0021,
+        "rotatable": false
+      },
+      {
+        "id": "motor",
+        "name": "发动机",
+        "icon": "⚙",
+        "size": [
+          1,
+          1
+        ],
+        "density": 0.0026,
+        "rotatable": false,
+        "torque": 0.24,
+        "maxSpeed": 0.34
+      },
+      {
+        "id": "fan",
+        "name": "风扇",
+        "icon": "✣",
+        "size": [
+          1,
+          1
+        ],
+        "density": 0.0018,
+        "rotatable": true,
+        "thrust": 0.01
+      },
+      {
+        "id": "balloon",
+        "name": "气球",
+        "icon": "♧",
+        "size": [
+          1,
+          1
+        ],
+        "density": 0.0008,
+        "rotatable": false,
+        "lift": 0.0078
+      },
+      {
+        "id": "rocket",
+        "name": "火箭",
+        "icon": "➤",
+        "size": [
+          1,
+          1
+        ],
+        "density": 0.0025,
+        "rotatable": true,
+        "thrust": 0.025,
+        "fuelMs": 2600
+      },
+      {
+        "id": "cockpit",
+        "name": "奶蛋奶豆双人舱",
+        "icon": "☻☻",
+        "size": [
+          2,
+          2
+        ],
+        "density": 0.0019,
+        "rotatable": false,
+        "required": true
+      }
+    ]
+  },
+  "blueprint": {
+    "version": 1,
+    "grid": {
+      "columns": 5,
+      "rows": 4
+    },
+    "cockpit": {
+      "id": "cockpit-1",
+      "type": "cockpit",
+      "x": 1,
+      "y": 0,
+      "width": 2,
+      "height": 2,
+      "rotation": 0,
+      "passengers": [
+        "naidan",
+        "naidou"
+      ]
+    },
+    "parts": [
+      {
+        "id": "wood-1",
+        "type": "wood",
+        "x": 1,
+        "y": 2,
+        "rotation": 0
+      },
+      {
+        "id": "wood-2",
+        "type": "wood",
+        "x": 2,
+        "y": 2,
+        "rotation": 0
+      },
+      {
+        "id": "wheel-1",
+        "type": "wheel",
+        "x": 0,
+        "y": 2,
+        "rotation": 0
+      },
+      {
+        "id": "wheel-2",
+        "type": "wheel",
+        "x": 3,
+        "y": 2,
+        "rotation": 0
+      },
+      {
+        "id": "motor-1",
+        "type": "motor",
+        "x": 3,
+        "y": 1,
+        "rotation": 0
+      }
+    ]
+  },
+  "levels": {
+    "schemaVersion": 1,
+    "note": "Rebalanced; deterministic solutions in scripts/test_physics.js",
+    "levels": [
+      {
+        "id": 1,
+        "name": "风车谷 · 第一次远行",
+        "lesson": "基本造车与发动机",
+        "goal": {
+          "x": 1700,
+          "y": 402
+        },
+        "spawn": {
+          "x": 120,
+          "groundY": 300
+        },
+        "segments": [
+          [
+            0,
+            300,
+            350,
+            300
+          ],
+          [
+            350,
+            300,
+            470,
+            335
+          ],
+          [
+            470,
+            335,
+            600,
+            405
+          ],
+          [
+            600,
+            405,
+            740,
+            450
+          ],
+          [
+            740,
+            450,
+            890,
+            450
+          ],
+          [
+            890,
+            450,
+            1020,
+            415
+          ],
+          [
+            1020,
+            415,
+            1190,
+            370
+          ],
+          [
+            1190,
+            370,
+            1350,
+            370
+          ],
+          [
+            1350,
+            370,
+            1450,
+            402
+          ],
+          [
+            1450,
+            402,
+            1680,
+            402
+          ],
+          [
+            1680,
+            402,
+            1880,
+            402
+          ]
+        ],
+        "inventory": {
+          "wood": 7,
+          "wheel": 4,
+          "motor": 2,
+          "fan": 0,
+          "balloon": 0,
+          "rocket": 0
+        },
+        "example": {
+          "version": 1,
+          "grid": {
+            "columns": 5,
+            "rows": 4
+          },
+          "cockpit": {
+            "id": "cockpit-1",
+            "type": "cockpit",
+            "x": 1,
+            "y": 0,
+            "width": 2,
+            "height": 2,
+            "rotation": 0,
+            "passengers": [
+              "naidan",
+              "naidou"
+            ]
+          },
+          "parts": [
+            {
+              "id": "wood-1",
+              "type": "wood",
+              "x": 1,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wood-2",
+              "type": "wood",
+              "x": 2,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wheel-1",
+              "type": "wheel",
+              "x": 0,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wheel-2",
+              "type": "wheel",
+              "x": 3,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "motor-1",
+              "type": "motor",
+              "x": 3,
+              "y": 1,
+              "rotation": 0
+            }
+          ]
+        },
+        "hint": "先看全图：下坡蓄势，穿过谷底，再爬上小屋前的山坡。长按前进，或点「发动机」自动行驶。",
+        "theme": "meadow",
+        "landmarks": [
+          {
+            "x": 160,
+            "y": 300,
+            "kind": "start"
+          },
+          {
+            "x": 1795,
+            "y": 402,
+            "kind": "house"
+          }
+        ],
+        "worldWidth": 1880,
+        "stars": [
+          {
+            "id": "1",
+            "x": 540,
+            "y": 306
+          },
+          {
+            "id": "2",
+            "x": 990,
+            "y": 320
+          },
+          {
+            "id": "3",
+            "x": 1500,
+            "y": 334
+          }
+        ],
+        "starHint": "下坡先收第一颗；上坡和小屋前还有两颗，别漏掉。"
+      },
+      {
+        "id": 2,
+        "name": "蘑菇岭 · 两段长坡",
+        "lesson": "重心、扭矩与摩擦",
+        "goal": {
+          "x": 1940,
+          "y": 310
+        },
+        "spawn": {
+          "x": 120,
+          "groundY": 460
+        },
+        "segments": [
+          [
+            0,
+            460,
+            360,
+            460
+          ],
+          [
+            360,
+            460,
+            540,
+            410
+          ],
+          [
+            540,
+            410,
+            700,
+            355
+          ],
+          [
+            700,
+            355,
+            900,
+            355
+          ],
+          [
+            900,
+            355,
+            1030,
+            400
+          ],
+          [
+            1030,
+            400,
+            1150,
+            400
+          ],
+          [
+            1150,
+            400,
+            1320,
+            340
+          ],
+          [
+            1320,
+            340,
+            1500,
+            275
+          ],
+          [
+            1500,
+            275,
+            1750,
+            275
+          ],
+          [
+            1750,
+            275,
+            1870,
+            310
+          ],
+          [
+            1870,
+            310,
+            2100,
+            310
+          ]
+        ],
+        "inventory": {
+          "wood": 8,
+          "wheel": 4,
+          "motor": 2,
+          "fan": 0,
+          "balloon": 0,
+          "rocket": 0
+        },
+        "example": {
+          "version": 1,
+          "grid": {
+            "columns": 5,
+            "rows": 4
+          },
+          "cockpit": {
+            "id": "cockpit-1",
+            "type": "cockpit",
+            "x": 1,
+            "y": 0,
+            "width": 2,
+            "height": 2,
+            "rotation": 0,
+            "passengers": [
+              "naidan",
+              "naidou"
+            ]
+          },
+          "parts": [
+            {
+              "id": "wood-1",
+              "type": "wood",
+              "x": 1,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wood-2",
+              "type": "wood",
+              "x": 2,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wheel-1",
+              "type": "wheel",
+              "x": 0,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wheel-2",
+              "type": "wheel",
+              "x": 3,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "motor-1",
+              "type": "motor",
+              "x": 3,
+              "y": 1,
+              "rotation": 0
+            },
+            {
+              "id": "motor-b",
+              "type": "motor",
+              "x": 3,
+              "y": 0,
+              "rotation": 0
+            }
+          ]
+        },
+        "hint": "先爬上蘑菇岭，再借凹谷冲第二段坡。发动机与车身重量会决定能否爬上去。",
+        "theme": "forest",
+        "landmarks": [
+          {
+            "x": 160,
+            "y": 460,
+            "kind": "start"
+          },
+          {
+            "x": 2035,
+            "y": 310,
+            "kind": "house"
+          }
+        ],
+        "worldWidth": 2100,
+        "stars": [
+          {
+            "id": "1",
+            "x": 600,
+            "y": 325
+          },
+          {
+            "id": "2",
+            "x": 1510,
+            "y": 207
+          },
+          {
+            "id": "3",
+            "x": 1810,
+            "y": 210
+          }
+        ],
+        "starHint": "把动力留给第二段长坡；山脊上方的星星要贴近才算。"
+      },
+      {
+        "id": 3,
+        "name": "断桥溪 · 飞过去还是走谷底",
+        "lesson": "风扇推进与惯性",
+        "goal": {
+          "x": 2220,
+          "y": 390
+        },
+        "spawn": {
+          "x": 120,
+          "groundY": 300
+        },
+        "segments": [
+          [
+            0,
+            300,
+            350,
+            300
+          ],
+          [
+            350,
+            300,
+            500,
+            360
+          ],
+          [
+            500,
+            360,
+            660,
+            400
+          ],
+          [
+            660,
+            400,
+            790,
+            350
+          ],
+          [
+            790,
+            620,
+            1280,
+            620
+          ],
+          [
+            1280,
+            620,
+            1500,
+            560
+          ],
+          [
+            1500,
+            560,
+            1700,
+            505
+          ],
+          [
+            1700,
+            505,
+            1900,
+            445
+          ],
+          [
+            1900,
+            445,
+            2100,
+            390
+          ],
+          [
+            2100,
+            390,
+            2380,
+            390
+          ]
+        ],
+        "inventory": {
+          "wood": 8,
+          "wheel": 4,
+          "motor": 2,
+          "fan": 2,
+          "balloon": 0,
+          "rocket": 0
+        },
+        "example": {
+          "version": 1,
+          "grid": {
+            "columns": 5,
+            "rows": 4
+          },
+          "cockpit": {
+            "id": "cockpit-1",
+            "type": "cockpit",
+            "x": 1,
+            "y": 0,
+            "width": 2,
+            "height": 2,
+            "rotation": 0,
+            "passengers": [
+              "naidan",
+              "naidou"
+            ]
+          },
+          "parts": [
+            {
+              "id": "wood-1",
+              "type": "wood",
+              "x": 1,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wood-2",
+              "type": "wood",
+              "x": 2,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wheel-1",
+              "type": "wheel",
+              "x": 0,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wheel-2",
+              "type": "wheel",
+              "x": 3,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "motor-1",
+              "type": "motor",
+              "x": 3,
+              "y": 1,
+              "rotation": 0
+            },
+            {
+              "id": "fan-a",
+              "type": "fan",
+              "x": 0,
+              "y": 1,
+              "rotation": 0
+            },
+            {
+              "id": "motor-b",
+              "type": "motor",
+              "x": 3,
+              "y": 0,
+              "rotation": 0
+            }
+          ]
+        },
+        "hint": "风扇加速冲出断桥，争取空中的星星。落入谷底也有补救路线；留意右岸台阶。",
+        "theme": "river",
+        "landmarks": [
+          {
+            "x": 160,
+            "y": 300,
+            "kind": "start"
+          },
+          {
+            "x": 2315,
+            "y": 390,
+            "kind": "house"
+          }
+        ],
+        "worldWidth": 2380,
+        "platforms": [
+          [
+            950,
+            450,
+            1190,
+            450
+          ]
+        ],
+        "stars": [
+          {
+            "id": "1",
+            "x": 1030,
+            "y": 340
+          },
+          {
+            "id": "2",
+            "x": 1080,
+            "y": 550
+          },
+          {
+            "id": "3",
+            "x": 1950,
+            "y": 359
+          }
+        ],
+        "starHint": "桥台上的星与谷底的星分属两条路线，可以换车分次补齐。"
+      },
+      {
+        "id": 4,
+        "name": "云朵峡 · 轻一点才飞得远",
+        "lesson": "浮力与高度控制",
+        "goal": {
+          "x": 1750,
+          "y": 410
+        },
+        "spawn": {
+          "x": 120,
+          "groundY": 390
+        },
+        "segments": [
+          [
+            0,
+            390,
+            420,
+            390
+          ],
+          [
+            420,
+            390,
+            560,
+            370
+          ],
+          [
+            920,
+            440,
+            1050,
+            440
+          ],
+          [
+            1050,
+            440,
+            1260,
+            380
+          ],
+          [
+            1260,
+            380,
+            1490,
+            380
+          ],
+          [
+            1490,
+            380,
+            1740,
+            410
+          ],
+          [
+            1740,
+            410,
+            1990,
+            410
+          ]
+        ],
+        "obstacles": [],
+        "inventory": {
+          "wood": 8,
+          "wheel": 4,
+          "motor": 2,
+          "fan": 2,
+          "balloon": 3,
+          "rocket": 0
+        },
+        "example": {
+          "version": 1,
+          "grid": {
+            "columns": 5,
+            "rows": 4
+          },
+          "cockpit": {
+            "id": "cockpit-1",
+            "type": "cockpit",
+            "x": 1,
+            "y": 0,
+            "width": 2,
+            "height": 2,
+            "rotation": 0,
+            "passengers": [
+              "naidan",
+              "naidou"
+            ]
+          },
+          "parts": [
+            {
+              "id": "wood-1",
+              "type": "wood",
+              "x": 1,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wood-2",
+              "type": "wood",
+              "x": 2,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wheel-1",
+              "type": "wheel",
+              "x": 0,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wheel-2",
+              "type": "wheel",
+              "x": 3,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "motor-1",
+              "type": "motor",
+              "x": 3,
+              "y": 1,
+              "rotation": 0
+            },
+            {
+              "id": "fan-a",
+              "type": "fan",
+              "x": 0,
+              "y": 1,
+              "rotation": 0
+            },
+            {
+              "id": "balloon-a",
+              "type": "balloon",
+              "x": 0,
+              "y": 0,
+              "rotation": 0
+            },
+            {
+              "id": "balloon-b",
+              "type": "balloon",
+              "x": 3,
+              "y": 0,
+              "rotation": 0
+            }
+          ]
+        },
+        "hint": "两只气球减轻车身，开风扇跨过峡谷。飞得太高就按住放气 V，下降到右岸落点。",
+        "theme": "sky",
+        "landmarks": [
+          {
+            "x": 160,
+            "y": 390,
+            "kind": "start"
+          },
+          {
+            "x": 1845,
+            "y": 410,
+            "kind": "house"
+          }
+        ],
+        "worldWidth": 1990,
+        "stars": [
+          {
+            "id": "1",
+            "x": 700,
+            "y": 315
+          },
+          {
+            "id": "2",
+            "x": 900,
+            "y": 260
+          },
+          {
+            "id": "3",
+            "x": 1510,
+            "y": 310
+          }
+        ],
+        "starHint": "第二颗在峡谷上方，调整气球数量或放气时机会改变路线。"
+      },
+      {
+        "id": 5,
+        "name": "落日矿谷 · 火箭快递",
+        "lesson": "动力与车体姿态",
+        "goal": {
+          "x": 2060,
+          "y": 355
+        },
+        "spawn": {
+          "x": 120,
+          "groundY": 380
+        },
+        "segments": [
+          [
+            0,
+            380,
+            360,
+            380
+          ],
+          [
+            360,
+            380,
+            510,
+            430
+          ],
+          [
+            510,
+            430,
+            670,
+            430
+          ],
+          [
+            670,
+            430,
+            820,
+            365
+          ],
+          [
+            1070,
+            440,
+            1280,
+            440
+          ],
+          [
+            1280,
+            440,
+            1480,
+            375
+          ],
+          [
+            1480,
+            375,
+            1670,
+            310
+          ],
+          [
+            1670,
+            310,
+            1850,
+            310
+          ],
+          [
+            1850,
+            310,
+            2010,
+            355
+          ],
+          [
+            2010,
+            355,
+            2240,
+            355
+          ]
+        ],
+        "inventory": {
+          "wood": 10,
+          "wheel": 4,
+          "motor": 2,
+          "fan": 3,
+          "balloon": 3,
+          "rocket": 2
+        },
+        "example": {
+          "version": 1,
+          "grid": {
+            "columns": 5,
+            "rows": 4
+          },
+          "cockpit": {
+            "id": "cockpit-1",
+            "type": "cockpit",
+            "x": 1,
+            "y": 0,
+            "width": 2,
+            "height": 2,
+            "rotation": 0,
+            "passengers": [
+              "naidan",
+              "naidou"
+            ]
+          },
+          "parts": [
+            {
+              "id": "wood-1",
+              "type": "wood",
+              "x": 1,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wood-2",
+              "type": "wood",
+              "x": 2,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wheel-1",
+              "type": "wheel",
+              "x": 0,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "wheel-2",
+              "type": "wheel",
+              "x": 3,
+              "y": 2,
+              "rotation": 0
+            },
+            {
+              "id": "motor-1",
+              "type": "motor",
+              "x": 3,
+              "y": 1,
+              "rotation": 0
+            },
+            {
+              "id": "rocket-a",
+              "type": "rocket",
+              "x": 0,
+              "y": 1,
+              "rotation": 0
+            },
+            {
+              "id": "motor-b",
+              "type": "motor",
+              "x": 3,
+              "y": 0,
+              "rotation": 0
+            }
+          ]
+        },
+        "hint": "驶入下坡蓄势，看到火箭路牌再短按点火；越过矿谷后，留点动力爬上终点山脊。",
+        "theme": "sunset",
+        "rocketWindow": [
+          650,
+          810
+        ],
+        "landmarks": [
+          {
+            "x": 160,
+            "y": 380,
+            "kind": "start"
+          },
+          {
+            "x": 2155,
+            "y": 355,
+            "kind": "house"
+          }
+        ],
+        "worldWidth": 2240,
+        "stars": [
+          {
+            "id": "1",
+            "x": 590,
+            "y": 362
+          },
+          {
+            "id": "2",
+            "x": 960,
+            "y": 280
+          },
+          {
+            "id": "3",
+            "x": 1780,
+            "y": 240
+          }
+        ],
+        "starHint": "矿谷中央的星靠短促点火接近，落地后继续寻找山脊上的星。"
+      }
+    ]
+  }
+};

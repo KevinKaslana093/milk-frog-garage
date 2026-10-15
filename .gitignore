@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.openai/
+.sites-build/
+.playwright-cli/
+.env
+.env.*
+*.log

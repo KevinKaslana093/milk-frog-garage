@@ -1,0 +1,11 @@
+{
+  "name": "milk-frog-garage",
+  "version": "0.3.3",
+  "private": true,
+  "description": "奶蛋与奶豆同车的原创物理拼装游戏，基于用户交接原型继续开发",
+  "scripts": {
+    "test": "node scripts/validate_data.js && node scripts/test_physics.js",
+    "build": "node scripts/build.js",
+    "start": "python -m http.server 8765"
+  }
+}

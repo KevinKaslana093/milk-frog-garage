@@ -1,0 +1,490 @@
+{
+  "engine": "Matter.js 0.20.0",
+  "fixedStepHz": 120,
+  "passed": 28,
+  "results": [
+    {
+      "level": 1,
+      "seconds": 7.5,
+      "axleError": 0.00431,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 1 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 2,
+      "seconds": 9.025,
+      "axleError": 0.00505,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "motor-b",
+            "type": "motor",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 2 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 3,
+      "seconds": 3.867,
+      "axleError": 0.04834,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "fan-a",
+            "type": "fan",
+            "x": 0,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "motor-b",
+            "type": "motor",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 3 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 4,
+      "seconds": 2.733,
+      "axleError": 0.00756,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "fan-a",
+            "type": "fan",
+            "x": 0,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "balloon-a",
+            "type": "balloon",
+            "x": 0,
+            "y": 0,
+            "rotation": 0
+          },
+          {
+            "id": "balloon-b",
+            "type": "balloon",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 4 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 5,
+      "seconds": 8.417,
+      "axleError": 0.00752,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "rocket-a",
+            "type": "rocket",
+            "x": 0,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "motor-b",
+            "type": "motor",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 5 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "name": "Valley recovery route on level 3 is also solvable",
+      "status": "PASS"
+    },
+    {
+      "name": "Second valid vehicle solves level 1",
+      "status": "PASS"
+    },
+    {
+      "name": "Stationary wheels settle without explosion",
+      "status": "PASS"
+    },
+    {
+      "name": "No ground means no scripted horizontal propulsion",
+      "status": "PASS"
+    },
+    {
+      "name": "No motor means no wheel drive",
+      "status": "PASS"
+    },
+    {
+      "name": "Mass and centre change with actual parts",
+      "status": "PASS"
+    },
+    {
+      "name": "Four thruster orientations change force direction",
+      "status": "PASS"
+    },
+    {
+      "name": "Off-centre thrust causes angular response",
+      "status": "PASS"
+    },
+    {
+      "name": "Balloons apply lift and vent reduces it",
+      "status": "PASS"
+    },
+    {
+      "name": "Rocket fuel runs out",
+      "status": "PASS"
+    },
+    {
+      "name": "Wall blocks vehicle",
+      "status": "PASS"
+    },
+    {
+      "name": "Inversion alone does not fail and both passengers stay",
+      "status": "PASS"
+    },
+    {
+      "name": "Cabin outside finish cannot win via another part",
+      "status": "PASS"
+    },
+    {
+      "name": "Both passengers required at finish",
+      "status": "PASS"
+    },
+    {
+      "name": "Falling loses, retry preserves immutable blueprint",
+      "status": "PASS"
+    },
+    {
+      "name": "Duplicate and cabin overlap rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Disconnected frame and unanchored wheels rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Stock, cabin bounds, malformed save rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Independent passenger reactions",
+      "status": "PASS"
+    },
+    {
+      "name": "Finish does not require collecting stars",
+      "status": "PASS"
+    },
+    {
+      "name": "All three rewards on every map are attainable",
+      "status": "PASS"
+    },
+    {
+      "name": "Retry restores all three world stars",
+      "status": "PASS"
+    },
+    {
+      "name": "Thirty restart cycles stay finite and stable",
+      "status": "PASS"
+    }
+  ]
+}
