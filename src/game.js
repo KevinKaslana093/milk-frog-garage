@@ -1,5 +1,5 @@
 /*
- * 《奶蛙造车记》V0.4.1 场景拼装版 — based on supplied prototype
+ * 《奶蛙造车记》V0.4.2 场景拼装版 — based on supplied prototype
  * Local Matter.js 0.20; character sprites derived from user supplied references.
  * Goal: an editable blueprint + a physically-driven test cart.
  */
@@ -36,13 +36,18 @@
   let engine = null, car = null, wheelBodies = [], groundBodies = [], goalBody = null;
   let cameraX = 0, last = 0, accumulator = 0, now = 0, fuel = 1, fanStates = [];
   const fanKeys=['F','G','H'],fanColors=['#3d806a','#b47a31','#567da7'];
-  let sim = null, history = [], future = [], scores = {}, muted = false, audio = null;
+  let sim = null, history = [], future = [], scores = {};
+  const sound=new NaiAudio.Soundscape();
+  let soundPanelOpen=false,backgroundBlocked=false;
   let elapsed = 0, status = '', unlocked = 1;
   const controls = {left:false,right:false,rocket:false,brake:false,vent:false};
   const STORAGE = 'naiwa-car-v011-progress';
 
-  try { starProgress=JSON.parse(localStorage.getItem('naiwa-stars-v032')||'{}');if(!starProgress||typeof starProgress!=='object')starProgress={};scores=Object.fromEntries(Object.entries(starProgress).map(([k,v])=>[k,Array.isArray(v)?v.filter(Boolean).length:0])); muted=localStorage.getItem('naiwa-muted')==='true'; }catch(_){}
-  try { unlocked = Math.max(1, Number(JSON.parse(localStorage.getItem(STORAGE) || '{}').unlocked) || 1); } catch (_) {}
+  try {
+    const saved=JSON.parse(localStorage.getItem('naiwa-stars-v032')||'{}');
+    for(let i=0;i<levels.length;i++)if(Array.isArray(saved?.[i])){starProgress[i]=[0,1,2].map(j=>saved[i][j]===true);scores[i]=starProgress[i].filter(Boolean).length;}
+  }catch(_){}
+  try {const n=JSON.parse(localStorage.getItem(STORAGE)||'{}')?.unlocked;if(Number.isFinite(n))unlocked=Math.max(1,Math.min(levels.length,Math.floor(n)));}catch(_){}
   try {if(localStorage.getItem('naiwa-map2-revision')!=='switchback-v1'){delete starProgress[1];delete scores[1];localStorage.setItem('naiwa-stars-v032',JSON.stringify(starProgress));localStorage.setItem('naiwa-map2-revision','switchback-v1');}}catch(_){}
 
   function info(msg) { status = msg; $('statusText').textContent = msg; }
@@ -66,9 +71,14 @@
   function remember(){history.push(structuredClone(blueprint));if(history.length>60)history.shift();future=[];}
   function undo(){if(!history.length)return;future.push(structuredClone(blueprint));blueprint=history.pop();drawGrid();}
   function redo(){if(!future.length)return;history.push(structuredClone(blueprint));blueprint=future.pop();drawGrid();}
-  function tone(freq=440,duration=.12){
-    if(muted)return;try{audio ||= new (window.AudioContext||window.webkitAudioContext)();audio.resume();const o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(.055,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+duration);}catch(_){}
+  function syncSound(){sound.setPaused(state==='paused'||backgroundBlocked||document.hidden);sound.setMode(state);}
+  function refreshSound(){
+    $('soundBtn').textContent=sound.muted?'声音：关':'声音设置';$('muteBtn').textContent=sound.muted?'打开全部声音':'全部静音';$('muteBtn').setAttribute('aria-pressed',String(sound.muted));
+    for(const key of ['music','effects']){$(key+'Volume').value=Math.round(sound[key]*100);$(key+'Value').textContent=Math.round(sound[key]*100)+'%';}
   }
+  function closeSound(){soundPanelOpen=false;$('soundPanel').classList.add('hidden');$('soundBtn').setAttribute('aria-expanded','false');syncSound();$('soundBtn').focus();}
+  document.addEventListener('pointerdown',()=>{backgroundBlocked=false;syncSound();sound.unlock();},true);
+  document.addEventListener('keydown',()=>{backgroundBlocked=false;syncSound();sound.unlock();},true);
   function drawGrid() {
     const grid = $('grid'); grid.replaceChildren();
     const cells=occupancy();
@@ -78,7 +88,7 @@
       b.textContent='';
       
       b.setAttribute('aria-label',`第${y+1}行第${x+1}列 ${isLocked(x,y)?'双人舱':part?partName(part.type):'空格'}`);
-      b.draggable=!!part;b.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',JSON.stringify({x,y})));b.addEventListener('dragover',e=>e.preventDefault());b.addEventListener('drop',e=>{e.preventDefault();try{const from=JSON.parse(e.dataTransfer.getData('text/plain'));if(from.type){selectedPart=from.type;putPart(x,y);}else movePiece(from.x,from.y,x,y);}catch(_){}});
+      b.draggable=!!part;b.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',JSON.stringify({x,y})));b.addEventListener('dragover',e=>e.preventDefault());b.addEventListener('drop',e=>{e.preventDefault();try{const from=JSON.parse(e.dataTransfer.getData('text/plain'));if(!from||typeof from!=='object')return;if(typeof from.type==='string'&&Object.prototype.hasOwnProperty.call(parts,from.type)){selectedPart=from.type;putPart(x,y);}else if(Number.isInteger(from.x)&&Number.isInteger(from.y)&&from.x>=0&&from.x<5&&from.y>=0&&from.y<4)movePiece(from.x,from.y,x,y);}catch(_){}});
       b.title=`${x},${y} ${part?.type?partName(part.type):'空格'}`;
       b.addEventListener('click',()=>putPart(x,y));grid.appendChild(b);
     }
@@ -109,11 +119,13 @@
     if(selectedPart==='cockpit'){
       if(blueprint.cockpit){movePiece(blueprint.cockpit.x,blueprint.cockpit.y,x,y);return;}
       if(x>3||y>2||blueprint.parts.some(p=>p.x>=x&&p.x<x+2&&p.y>=y&&p.y<y+2)){$('buildWarning').textContent='双人舱需要连续的 2×2 空格';return;}
-      remember();blueprint.cockpit={id:'cockpit-1',type:'cockpit',x,y,width:2,height:2,rotation:0,passengers:['naidan','naidou']};tone(480,.05);drawGrid();return;
+      remember();blueprint.cockpit={id:'cockpit-1',type:'cockpit',x,y,width:2,height:2,rotation:0,passengers:['naidan','naidou']};sound.sfx('place');drawGrid();return;
     }
     if(isLocked(x,y)){if(selectedPart==='erase'){remember();blueprint.cockpit=null;drawGrid();}else $('buildWarning').textContent='这里是双人舱，可移动或用拆除收回';return;}
-    remember();tone(380,.04);
     const occupying=blueprint.parts.find(p=>p.x===x&&p.y===y);
+    if(!occupying&&selectedPart==='erase')return;
+    if(!occupying&&countType(selectedPart)>=(inventory()[selectedPart]||0)){$('buildWarning').textContent=`${partName(selectedPart)}已用完`;return;}
+    remember();sound.sfx(selectedPart==='erase'?'remove':'place');
     if(occupying) {
       if(selectedPart===occupying.type && parts[selectedPart]?.rotatable) occupying.rotation=(occupying.rotation+1)%4;
       else blueprint.parts=blueprint.parts.filter(p=>p!==occupying);
@@ -130,7 +142,8 @@
     const cabin=isLocked(fx,fy),target=cabin?blueprint.cockpit:blueprint.parts.find(p=>p.x===fx&&p.y===fy);if(!target)return;
     const w=cabin?2:1,h=w;
     if(x<0||y<0||x+w>5||y+h>4||blueprint.parts.some(p=>p!==target&&p.x>=x&&p.x<x+w&&p.y>=y&&p.y<y+h)||(!cabin&&isLocked(x,y))){$('buildWarning').textContent='这里放不下，先拆除占用的零件';return;}
-    remember();target.x=x;target.y=y;drawGrid();
+    if(target.x===x&&target.y===y)return;
+    remember();target.x=x;target.y=y;sound.sfx('place');drawGrid();
   }
   function resetBlueprint() { remember();blueprint=NaiPhysics.emptyBlueprint();selectedPart='cockpit';selectedRotation=0;$('rotateBtn').textContent='旋转 0°';drawGrid(); }
   function saveBlueprint() {
@@ -154,7 +167,7 @@
     $('rocketBtn').disabled=!countType('rocket');$('ventBtn').disabled=!countType('balloon');
     updateDriveButtons();
   }
-  function toggleFan(i){if(state!=='test'||!sim.items.some(p=>p.type==='fan'&&p.fanIndex===i&&p.attached))return;fanStates[i]=!fanStates[i];updateFanButtons();tone(fanStates[i]?440+i*100:260,.05);}
+  function toggleFan(i){if(state!=='test'||!sim.items.some(p=>p.type==='fan'&&p.fanIndex===i&&p.attached))return;fanStates[i]=!fanStates[i];updateFanButtons();sound.sfx('switch');}
   function updateFanButtons(){
     for(const p of sim.items.filter(p=>p.type==='fan')){const i=p.fanIndex,b=$('fanBtn-'+i);if(!p.attached)fanStates[i]=false;const on=fanStates[i],label=p.attached?(on?'开':'关'):'脱落';b.disabled=!p.attached;b.classList.toggle('engaged',on);b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',`风扇 ${i+1}，${label}，快捷键 ${fanKeys[i]} 或 ${i+1}`);b.textContent=`风扇 ${i+1} ${['→','↓','←','↑'][p.rotation]}\n${fanKeys[i]} / ${i+1} · ${label}`;}
   }
@@ -169,24 +182,24 @@
   }
   function start() {
     if(state==='build') {const error=validate();if(error){$('buildWarning').textContent=error;return;}}
-    resetControls();makeWorld();makeCar();state='test';tone(660);setVisibleState();info('长按驱动轮子，F/G/H 或 1/2/3 独立开关风扇');
+    resetControls();makeWorld();makeCar();state='test';setVisibleState();sound.sfx('start');info('长按驱动轮子，F/G/H 或 1/2/3 独立开关风扇');
   }
   function edit() {state='build';overview=false;cameraX=0;sim=null;car=null;resetControls();$('modal').classList.add('hidden');setVisibleState();drawGrid();}
   function retry() {resetControls();$('modal').classList.add('hidden');start();}
   function resetControls(){for(const k in controls)controls[k]=false;document.querySelectorAll('.engaged:not(.fanControl)').forEach(e=>e.classList.remove('engaged'));}
   function setVisibleState() {
-    $('app').dataset.state=state;
+    $('app').dataset.state=state;syncSound();
     $('introOverlay').classList.toggle('hidden',state!=='intro');$('starGoal').classList.toggle('hidden',!['build','intro'].includes(state));$('tourBtn').classList.toggle('hidden',state!=='build');
     $('mapBtn').classList.toggle('hidden',!['build','test','paused'].includes(state));$('mapBtn').textContent=overview?'回到载具':'查看全图';
     $('buildPanel').classList.toggle('overview',overview);
-    $('autoBtn').textContent=autoDrive?'发动机 · 开':'发动机 · 关';
+    if(sim)updateDriveButtons();
     $('buildPanel').classList.toggle('hidden',state!=='build');
     $('hud').classList.toggle('hidden',!['test','paused'].includes(state));
     $('pauseBtn').textContent=state==='paused'?'继续':'暂停';$('pauseBtn').disabled=!['test','paused'].includes(state);$('resumeBtn').classList.toggle('hidden',state!=='paused');
   }
   function succeed() {
     if(state!=='test') return;
-    state='success';resetControls();setVisibleState();tone(880,.35);
+    state='success';resetControls();setVisibleState();sound.sfx('win');
     const previous=Array.isArray(starProgress[levelIndex])?starProgress[levelIndex]:[false,false,false];
     starProgress[levelIndex]=sim.collected.map((v,i)=>v||previous[i]);
     const stars=sim.collected.filter(Boolean).length; scores[levelIndex]=starProgress[levelIndex].filter(Boolean).length;
@@ -201,7 +214,7 @@
   }
   function fail(msg) {
     if(state!=='test') return;
-    state='failed';resetControls();setVisibleState();tone(180,.25);
+    state='failed';resetControls();setVisibleState();sound.sfx('fail');
     $('modalTitle').textContent='掉出安全区了，再试一次';
     $('modalText').textContent=msg+' 不要紧，载具设计已经保留，回去改改就好。';
     $('nextBtn').style.display='none';$('modal').classList.remove('hidden');
@@ -215,7 +228,7 @@
   function tick(){
     if(state!=='test'||!sim)return;
     sim.step({...controls,right:controls.right||(autoDrive&&!controls.left&&!controls.brake),fans:fanStates});elapsed=sim.time;fuel=sim.fuel;
-    const n=sim.collected.filter(Boolean).length;if(n>lastStarCount){tone(740+n*130,.14);lastStarCount=n;}
+    const n=sim.collected.filter(Boolean).length;if(n>lastStarCount){sound.sfx('star');lastStarCount=n;}
     if(sim.status==='failed'){fail('奶蛋和奶豆一起掉出了安全区域。');return;}
     if(sim.status==='success'){succeed();return;}
     const p=sim.cabin.position;
@@ -253,7 +266,7 @@
     NaiArt.cabin(ctx,sim.cabin.position.x,sim.cabin.position.y,c.angle,sim.motion);
     for(const w of sim.wheels)NaiArt.part(ctx,{type:'wheel'},w.position.x,w.position.y,w.angle);
     for(const p of sim.items.filter(p=>p.type==='fan')){const pt=sim.mount(p);drawFanBadge(pt.x,pt.y,p.fanIndex,p.attached&&fanStates[p.fanIndex],!p.attached);}
-    for(const e of sim.damageEvents){const t=sim.time-e.time;ctx.save();ctx.globalAlpha=Math.max(0,1-t/1.2);ctx.fillStyle=e.type==='pop'?'#fff1cb':'#bd854c';for(let i=0;i<7;i++){const a=i*2.4;ctx.fillRect(e.x+Math.cos(a)*t*55,e.y+Math.sin(a)*t*45+t*t*30,4,4);}ctx.restore();}
+    for(const e of sim.damageEvents){if(e.type==='impact')continue;const t=sim.time-e.time;ctx.save();ctx.globalAlpha=Math.max(0,1-t/1.2);ctx.fillStyle=e.type==='pop'?'#fff1cb':'#bd854c';for(let i=0;i<7;i++){const a=i*2.4;ctx.fillRect(e.x+Math.cos(a)*t*55,e.y+Math.sin(a)*t*45+t*t*30,4,4);}ctx.restore();}
   }
   function buildOrigin(){const l=levels[levelIndex];return {x:l.spawn.x,y:l.spawn.groundY-GRID_H*TILE-5};}
   function drawFanBadge(x,y,i,on=false,lost=false){ctx.save();ctx.translate(x-12,y-13);ctx.fillStyle=lost?'#7b7b73':fanColors[i%fanColors.length];ctx.strokeStyle=on?'#fff5b0':'#f4f0d5';ctx.lineWidth=on?2:1;ctx.beginPath();ctx.arc(0,0,7,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(i+1),0,.5);ctx.restore();}
@@ -294,34 +307,40 @@
   function paint(timestamp){
     now=timestamp;const raw=Math.min(100,timestamp-(last||timestamp));last=timestamp;
     if(state==='test'){accumulator+=raw;let n=0;while(state==='test'&&accumulator>=NaiPhysics.STEP&&n++<10){tick();accumulator-=NaiPhysics.STEP;}if(n>=10)accumulator=0;}
+    sound.update(state,sim,{...controls,right:controls.right||(autoDrive&&!controls.left&&!controls.brake),fans:fanStates});
     updateView();background();ctx.save();ctx.scale(zoom,zoom);ctx.translate(-cameraX,-cameraY);drawTerrain();if(car&&state!=='build')drawCar();if(state==='build'||state==='intro')drawBuildPreview();ctx.restore();
     if(state==='paused') {ctx.fillStyle='#0005';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.font='bold 45px sans-serif';ctx.textAlign='center';ctx.fillText('已暂停',W/2,H/2);ctx.textAlign='left';}
     requestAnimationFrame(paint);
   }
   function bindHold(id,key){
     const el=$(id);
-    el.addEventListener('pointerdown',e=>{if(state!=='test')return;e.preventDefault();tone(220,.03);el.setPointerCapture(e.pointerId);controls[key]=true;el.classList.add('engaged');});
+    el.addEventListener('pointerdown',e=>{if(state!=='test')return;e.preventDefault();sound.sfx('switch');el.setPointerCapture(e.pointerId);controls[key]=true;el.classList.add('engaged');});
     for(const ev of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(ev,()=>{controls[key]=false;el.classList.remove('engaged');});
   }
   bindHold('leftBtn','left');bindHold('rightBtn','right');bindHold('rocketBtn','rocket');bindHold('brakeBtn','brake');
-  $('ventBtn').onclick=()=>{if(state==='test'&&sim.popBalloon()){tone(160,.06);updateDriveButtons();}};
+  $('ventBtn').onclick=()=>{if(state==='test'&&sim.popBalloon()){updateDriveButtons();}};
   $('rotateBtn').addEventListener('click',()=>{selectedRotation=(selectedRotation+1)%4;$('rotateBtn').textContent=`旋转 ${selectedRotation*90}°`;$('selection').textContent=`当前：${partName(selectedPart)} · ${directionHint()}`;});
   $('startBtn').addEventListener('click',start);$('editBtn').addEventListener('click',edit);$('retryBtn').addEventListener('click',retry);
   $('resetBtn').addEventListener('click',resetBlueprint);$('saveBtn').addEventListener('click',saveBlueprint);$('loadBtn').addEventListener('click',loadBlueprint);
   $('modalEdit').addEventListener('click',edit);$('modalRetry').addEventListener('click',retry);
   $('nextBtn').addEventListener('click',()=>changeLevel(levelIndex+1));
   $('levelSelect').addEventListener('change',e=>changeLevel(Number(e.target.value)));
-  $('pauseBtn').addEventListener('click',()=>{if(state==='test'){state='paused';resetControls();if(audio)audio.suspend();setVisibleState();}else if(state==='paused'){state='test';last=performance.now();accumulator=0;if(audio&&!muted)audio.resume();setVisibleState();}});
-  $('soundBtn').textContent=muted?'声音：关':'声音：开';$('soundBtn').onclick=()=>{muted=!muted;try{localStorage.setItem('naiwa-muted',String(muted));}catch(_){}$('soundBtn').textContent=muted?'声音：关':'声音：开';tone();};
+  $('pauseBtn').addEventListener('click',()=>{if(state==='test'){state='paused';resetControls();setVisibleState();}else if(state==='paused'){state='test';last=performance.now();accumulator=0;setVisibleState();}});
+  refreshSound();
+  $('soundBtn').onclick=()=>{soundPanelOpen=true;$('soundPanel').classList.remove('hidden');$('soundBtn').setAttribute('aria-expanded','true');if(state==='test'){state='paused';resetControls();setVisibleState();}syncSound();refreshSound();$('closeSound').focus();};
+  $('closeSound').onclick=closeSound;
+  $('muteBtn').onclick=()=>{sound.configure('muted',!sound.muted);refreshSound();};
+  for(const key of ['music','effects'])$(key+'Volume').oninput=e=>{sound.configure(key,Number(e.target.value)/100);refreshSound();};
   $('undoBtn').onclick=undo;$('redoBtn').onclick=redo;$('resumeBtn').onclick=()=>$('pauseBtn').click();
-  $('homePlay').onclick=()=>{$('home').classList.add('hidden');tone(550);beginIntro();};
+  $('homePlay').onclick=()=>{$('home').classList.add('hidden');sound.sfx('start');beginIntro();};
   $('skipIntro').onclick=finishIntro;$('tourBtn').onclick=beginIntro;
   $('mapBtn').onclick=()=>{overview=!overview;$('mapBtn').textContent=overview?'回到载具':'查看全图';$('buildPanel').classList.toggle('overview',overview);};
-  $('autoBtn').onclick=()=>{if(state!=='test')return;autoDrive=!autoDrive;$('autoBtn').textContent=autoDrive?'发动机 · 开':'发动机 · 关';tone(260,.05);};
+  $('autoBtn').onclick=()=>{if(state!=='test')return;autoDrive=!autoDrive;$('autoBtn').textContent=autoDrive?'发动机 · 开':'发动机 · 关';sound.sfx('switch');};
   $('fullscreenBtn').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('app').requestFullscreen();}catch(_){$('fullscreenBtn').textContent='窗口模式';$('fullscreenBtn').title='当前浏览器不支持全屏，窗口内可直接游玩';}};
   document.addEventListener('fullscreenchange',()=>{$('fullscreenBtn').textContent=document.fullscreenElement?'退出全屏':'全屏';resize();});
   $('controlHelp').textContent=matchMedia('(pointer: coarse)').matches?'点选零件，再点格子；风扇按车上编号分别开关':'鼠标拼装 · A / D 驱动 · B 刹车 · 空格点火 · F/G/H 或 1/2/3 风扇 · V 放气';
   window.addEventListener('keydown',e=>{
+    if(soundPanelOpen){if(e.code==='Escape'){e.preventDefault();closeSound();}if(e.code==='Tab'){const focusable=Array.from($('soundPanel').querySelectorAll('button,input'));const first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}return;}
     if(e.target.matches('select,input,textarea'))return;
     if(!$('home').classList.contains('hidden'))return;
     if(state==='build'){
@@ -330,6 +349,7 @@
       if(e.code==='KeyR'&&!e.repeat){$('rotateBtn').click();return;}
       if(e.code==='Enter'&&!e.target.closest('button')){e.preventDefault();start();return;}
     }
+    if(e.ctrlKey||e.metaKey||e.altKey)return;
     if(e.code==='KeyM'&&!e.repeat&&['build','test','paused'].includes(state)){$('mapBtn').click();return;}
     if(['ArrowLeft','ArrowRight','Space','ArrowDown'].includes(e.code))e.preventDefault();
     if(state!=='test'){if(e.code==='Escape'&&state==='paused')$('pauseBtn').click();return;}
@@ -345,7 +365,7 @@
     if(e.code==='ArrowRight'||e.code==='KeyD')controls.right=false;
     if(e.code==='Space')controls.rocket=false;if(e.code==='KeyB'||e.code==='ArrowDown')controls.brake=false;if(e.code==='KeyV')controls.vent=false;
   });
-  const autoPause=()=>{resetControls();if(state==='test'){state='paused';setVisibleState();}if(audio)audio.suspend();};
+  const autoPause=()=>{backgroundBlocked=true;resetControls();if(state==='test'){state='paused';setVisibleState();}syncSound();};
   window.addEventListener('blur',autoPause);document.addEventListener('visibilitychange',()=>{if(document.hidden)autoPause();});window.addEventListener('orientationchange',autoPause);
   // Initial physics world for terrain preview; vehicle gets constructed only at Start.
   refreshSelect();drawGrid();makeWorld();setVisibleState();requestAnimationFrame(paint);

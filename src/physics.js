@@ -11,16 +11,16 @@
   const copy=x=>JSON.parse(JSON.stringify(x));
   function emptyBlueprint(){return {version:1,grid:{columns:5,rows:4},cockpit:null,parts:[]};}
   function validate(b,inventory,types,draft=false){
-    if(!b||b.grid?.columns!==5||b.grid?.rows!==4||!Array.isArray(b.parts))return '蓝图格式不正确';
+    if(!b||b.grid?.columns!==5||b.grid?.rows!==4||!Array.isArray(b.parts)||b.parts.length>20)return '蓝图格式不正确';
     const c=b.cockpit;
     if(c!==null&&(!c||typeof c!=='object'||Array.isArray(c)))return '双人舱数据不正确';
     if(!c&&!draft)return '先从零件栏放入奶蛋和奶豆的双人舱';
-    if(c&&c.passengers?.join(',')!=='naidan,naidou')return '双人舱必须同时容纳奶蛋与奶豆';
+    if(c&&(!Array.isArray(c.passengers)||c.passengers.length!==2||c.passengers[0]!=='naidan'||c.passengers[1]!=='naidou'))return '双人舱必须同时容纳奶蛋与奶豆';
     if(c&&(!Number.isInteger(c.x)||!Number.isInteger(c.y)||c.x<0||c.x>3||c.y<0||c.y>2))return '双人舱必须完整放在网格内';
-    const cells=new Map(),frame=new Set(),counts={};
+    const cells=new Map(),frame=new Set(),counts=Object.create(null);
     if(c)for(let y=c.y;y<c.y+2;y++)for(let x=c.x;x<c.x+2;x++){cells.set(`${x},${y}`,'cockpit');frame.add(`${x},${y}`);}
     for(const p of b.parts){
-      if(!types[p.type]||p.type==='cockpit'||!Number.isInteger(p.x)||!Number.isInteger(p.y)||p.x<0||p.x>4||p.y<0||p.y>3||!Number.isInteger(p.rotation)||p.rotation<0||p.rotation>3)return '存在无效零件、方向或坐标';
+      if(!p||typeof p!=='object'||Array.isArray(p)||typeof p.type!=='string'||!Object.prototype.hasOwnProperty.call(types,p.type)||p.type==='cockpit'||!Number.isInteger(p.x)||!Number.isInteger(p.y)||p.x<0||p.x>4||p.y<0||p.y>3||!Number.isInteger(p.rotation)||p.rotation<0||p.rotation>3)return '存在无效零件、方向或坐标';
       const k=`${p.x},${p.y}`;if(cells.has(k))return '零件不能重叠';cells.set(k,p.type);
       if(p.type!=='wheel')frame.add(k);counts[p.type]=(counts[p.type]||0)+1;
     }
@@ -73,14 +73,15 @@
       Composite.add(this.engine.world,[this.chassis,...this.wheels,...this.joints]);
       this.time=0;this.fuel=1;this.status='test';this.collected=[false,false,false];this.candy=false;this.maxAxleError=0;this.impact=0;
       this.passengers=['naidan','naidou'];this.motion=[{x:0,v:0},{x:0,v:0}];this.prevVX=0;
-      this.damageEvents=[];this.pendingDamage=new Map();this.ventHeld=false;
+      this.damageEvents=[];this.eventId=0;this.lastImpact=-1;this.pendingDamage=new Map();this.ventHeld=false;
       Events.on(this.engine,'collisionStart',e=>this.detectImpacts(e.pairs));
     }
     mount(p){return p.body.position;}
     angle(p){return p.attached&&p.type!=='wheel'?this.chassis.angle:p.body.angle;}
     attachedCount(type){return this.items.filter(p=>p.type===type&&p.attached&&!p.popped).length;}
     force(p,x,y){Body.applyForce(p.attached?this.chassis:p.body,this.mount(p),{x,y});}
-    popBalloon(){const p=this.items.find(p=>p.type==='balloon'&&p.attached&&!p.popped);if(p){p.popped=true;this.damageEvents.push({type:'pop',x:p.body.position.x,y:p.body.position.y,time:this.time});}return !!p;}
+    emit(type,p,extra={}){this.damageEvents.push({id:++this.eventId,type,x:p.body.position.x,y:p.body.position.y,time:this.time,...extra});}
+    popBalloon(){const p=this.items.find(p=>p.type==='balloon'&&p.attached&&!p.popped);if(p){p.popped=true;this.emit('pop',p);}return !!p;}
     detectImpacts(pairs){
       for(const pair of pairs){
         if(pair.isSensor)continue;
@@ -91,8 +92,9 @@
           const parent=piece.parent,v=Body.getVelocity(parent),w=Body.getAngularVelocity(parent),r={x:piece.position.x-parent.position.x,y:piece.position.y-parent.position.y};
           const speed=Math.abs((v.x-w*r.y)*n.x+(v.y+w*r.x)*n.y);
           if(!p&&piece===this.cabin&&speed>17)p=this.items.filter(p=>p.attached).sort((a,b)=>Math.hypot(a.body.position.x-piece.position.x,a.body.position.y-piece.position.y)-Math.hypot(b.body.position.x-piece.position.x,b.body.position.y-piece.position.y))[0];
+          if(speed>3&&this.time-this.lastImpact>.1){this.lastImpact=this.time;this.emit('impact',{body:piece},{strength:Math.min(2,speed/8)});}
           if(!p)continue;
-          if(p.type==='balloon'&&!p.popped&&speed>2){p.popped=true;continue;}
+          if(p.type==='balloon'&&!p.popped&&speed>2){p.popped=true;this.emit('pop',p);continue;}
           const safe=p.type==='wheel'?19:p.type==='wood'?12:14;
           if(speed>safe)this.pendingDamage.set(p,Math.max(this.pendingDamage.get(p)||0,(speed-safe)*16));
         }
@@ -117,7 +119,7 @@
           const old=p.body,b=Bodies.rectangle(old.position.x,old.position.y,27,p.type==='wood'?22:27,{angle:c.angle,density:this.types[p.type].density,friction:.65,frictionAir:.0015,restitution:.08,label:'debris-'+p.type});
           Body.setVelocity(b,pointVelocity(b.position));Body.setAngularVelocity(b,spin);p.body=b;Composite.add(this.engine.world,b);
         }
-        p.body.collisionFilter.group=0;this.damageEvents.push({type:'break',part:p.type,x:p.body.position.x,y:p.body.position.y,time:this.time});
+        p.body.collisionFilter.group=0;this.emit('break',p,{part:p.type});
       }
       Body.setParts(c,[this.cabin,...this.items.filter(p=>p.attached&&p.type!=='wheel').map(p=>p.body)]);
       Body.setVelocity(c,pointVelocity(c.position));Body.setAngularVelocity(c,spin);
@@ -141,7 +143,7 @@
         if(p.type==='fan'&&p.attached&&input.fans?.[p.fanIndex]===true)this.force(p,Math.cos(a)*defs.fan.thrust,Math.sin(a)*defs.fan.thrust);
         if(p.type==='rocket'&&p.attached&&input.rocket&&this.fuel>0)this.force(p,Math.cos(a)*defs.rocket.thrust,Math.sin(a)*defs.rocket.thrust);
       }
-      if(input.rocket&&this.items.some(p=>p.type==='rocket'))this.fuel=Math.max(0,this.fuel-STEP/defs.rocket.fuelMs);
+      if(input.rocket&&this.attachedCount('rocket')>0)this.fuel=Math.max(0,this.fuel-STEP/defs.rocket.fuelMs);
       Engine.update(this.engine,STEP);this.time+=STEP/1000;
       for(const [p,damage] of this.pendingDamage)if(p.attached){p.health-=damage;if(p.health<=0)this.detach(p);}this.pendingDamage.clear();
       this.damageEvents=this.damageEvents.filter(e=>this.time-e.time<1.2);

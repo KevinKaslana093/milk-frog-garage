@@ -1,7 +1,7 @@
 {
   "engine": "Matter.js 0.20.0",
   "fixedStepHz": 120,
-  "passed": 62,
+  "passed": 65,
   "results": [
     {
       "level": 1,
@@ -1712,6 +1712,18 @@
     },
     {
       "name": "No global fan switch silently starts every fan",
+      "status": "PASS"
+    },
+    {
+      "name": "Malformed imported parts and passengers return errors without throwing",
+      "status": "PASS"
+    },
+    {
+      "name": "Detached rockets neither propel the car nor drain its remaining fuel",
+      "status": "PASS"
+    },
+    {
+      "name": "Damage sound events have increasing IDs and expire",
       "status": "PASS"
     }
   ]
