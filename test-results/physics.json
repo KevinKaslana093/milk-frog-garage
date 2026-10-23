@@ -1,7 +1,7 @@
 {
   "engine": "Matter.js 0.20.0",
   "fixedStepHz": 120,
-  "passed": 31,
+  "passed": 58,
   "results": [
     {
       "level": 1,
@@ -146,8 +146,8 @@
     },
     {
       "level": 3,
-      "seconds": 3.867,
-      "axleError": 0.04834,
+      "seconds": 3.783,
+      "axleError": 0.03773,
       "candy": true,
       "blueprint": {
         "version": 1,
@@ -315,8 +315,8 @@
     },
     {
       "level": 5,
-      "seconds": 8.417,
-      "axleError": 0.00752,
+      "seconds": 8.475,
+      "axleError": 0.00805,
       "candy": true,
       "blueprint": {
         "version": 1,
@@ -392,6 +392,1158 @@
     },
     {
       "name": "Level 5 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 6,
+      "seconds": 9.325,
+      "axleError": 0.01033,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "motor-b",
+            "type": "motor",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 6 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 7,
+      "seconds": 7.55,
+      "axleError": 0.00416,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "motor-b",
+            "type": "motor",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 7 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 8,
+      "seconds": 3.35,
+      "axleError": 0.00545,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "fan-a",
+            "type": "fan",
+            "x": 0,
+            "y": 1,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 8 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 9,
+      "seconds": 3.3,
+      "axleError": 0.03211,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "fan-a",
+            "type": "fan",
+            "x": 0,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "motor-b",
+            "type": "motor",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 9 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 10,
+      "seconds": 17.183,
+      "axleError": 0.02427,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "motor-b",
+            "type": "motor",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 10 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 11,
+      "seconds": 2.925,
+      "axleError": 0.01072,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "fan-a",
+            "type": "fan",
+            "x": 0,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "balloon-a",
+            "type": "balloon",
+            "x": 0,
+            "y": 0,
+            "rotation": 0
+          },
+          {
+            "id": "balloon-b",
+            "type": "balloon",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 11 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 12,
+      "seconds": 8.283,
+      "axleError": 0.0041,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "motor-b",
+            "type": "motor",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 12 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 13,
+      "seconds": 9.583,
+      "axleError": 0.01231,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "rocket-a",
+            "type": "rocket",
+            "x": 0,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "motor-b",
+            "type": "motor",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 13 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 14,
+      "seconds": 9.817,
+      "axleError": 0.00609,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 14 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 15,
+      "seconds": 3.933,
+      "axleError": 0.0349,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "fan-a",
+            "type": "fan",
+            "x": 0,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "motor-b",
+            "type": "motor",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 15 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 16,
+      "seconds": 3.442,
+      "axleError": 0.00947,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "fan-a",
+            "type": "fan",
+            "x": 0,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "balloon-a",
+            "type": "balloon",
+            "x": 0,
+            "y": 0,
+            "rotation": 0
+          },
+          {
+            "id": "balloon-b",
+            "type": "balloon",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 16 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 17,
+      "seconds": 17.325,
+      "axleError": 0.02887,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "motor-b",
+            "type": "motor",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 17 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 18,
+      "seconds": 3.825,
+      "axleError": 0.01514,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "fan-a",
+            "type": "fan",
+            "x": 0,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "motor-b",
+            "type": "motor",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 18 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 19,
+      "seconds": 10,
+      "axleError": 0.0098,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "rocket-a",
+            "type": "rocket",
+            "x": 0,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "motor-b",
+            "type": "motor",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 19 real-force solution",
+      "status": "PASS"
+    },
+    {
+      "level": 20,
+      "seconds": 20.15,
+      "axleError": 0.02427,
+      "candy": true,
+      "blueprint": {
+        "version": 1,
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "cockpit": {
+          "id": "cockpit-1",
+          "type": "cockpit",
+          "x": 1,
+          "y": 0,
+          "width": 2,
+          "height": 2,
+          "rotation": 0,
+          "passengers": [
+            "naidan",
+            "naidou"
+          ]
+        },
+        "parts": [
+          {
+            "id": "wood-1",
+            "type": "wood",
+            "x": 1,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wood-2",
+            "type": "wood",
+            "x": 2,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-1",
+            "type": "wheel",
+            "x": 0,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "wheel-2",
+            "type": "wheel",
+            "x": 3,
+            "y": 2,
+            "rotation": 0
+          },
+          {
+            "id": "motor-1",
+            "type": "motor",
+            "x": 3,
+            "y": 1,
+            "rotation": 0
+          },
+          {
+            "id": "motor-b",
+            "type": "motor",
+            "x": 3,
+            "y": 0,
+            "rotation": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Level 20 real-force solution",
       "status": "PASS"
     },
     {
@@ -496,6 +1648,54 @@
     },
     {
       "name": "Thirty restart cycles stay finite and stable",
+      "status": "PASS"
+    },
+    {
+      "name": "Unpowered controls add no motion on flat ground",
+      "status": "PASS"
+    },
+    {
+      "name": "The same unpowered cart rolls down a real slope",
+      "status": "PASS"
+    },
+    {
+      "name": "One vent press pops exactly one balloon and never refills it",
+      "status": "PASS"
+    },
+    {
+      "name": "Gentle wall contact does not break parts",
+      "status": "PASS"
+    },
+    {
+      "name": "Moderate impact damages connections before fracture",
+      "status": "PASS"
+    },
+    {
+      "name": "Severe real collision detaches motor and wheel without auto-failing",
+      "status": "PASS"
+    },
+    {
+      "name": "Fracture keeps part positions and conserves linear momentum",
+      "status": "PASS"
+    },
+    {
+      "name": "Broken support releases its unsupported wheel",
+      "status": "PASS"
+    },
+    {
+      "name": "Detached fan stops propelling the cabin",
+      "status": "PASS"
+    },
+    {
+      "name": "Fracture remains stable through repeated rotated splits",
+      "status": "PASS"
+    },
+    {
+      "name": "Damaged vehicle can still finish with both passengers",
+      "status": "PASS"
+    },
+    {
+      "name": "Retry restores lost parts and balloons from immutable blueprint",
       "status": "PASS"
     }
   ]

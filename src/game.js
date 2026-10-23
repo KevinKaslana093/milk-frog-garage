@@ -1,5 +1,5 @@
 /*
- * 《奶蛙造车记》V0.3.4 场景拼装版 — based on supplied prototype
+ * 《奶蛙造车记》V0.4.0 场景拼装版 — based on supplied prototype
  * Local Matter.js 0.20; character sprites derived from user supplied references.
  * Goal: an editable blueprint + a physically-driven test cart.
  */
@@ -47,6 +47,7 @@
   function info(msg) { status = msg; $('statusText').textContent = msg; }
   function inventory() { return levels[levelIndex].inventory; }
   function partName(t) { return parts[t]?.name || t; }
+  function directionHint(){return ['fan','rocket'].includes(selectedPart)?`推力 ${['→','↓','←','↑'][selectedRotation]} · ${selectedPart==='fan'?'吹风':'喷气'} ${['←','↑','→','↓'][selectedRotation]} · R 旋转`:selectedPart==='motor'?'发动机给轮子传动，本身不产生推力':`${selectedRotation*90}°`;}
   function countType(t) { return blueprint.parts.filter(p => p.type === t).length; }
   function occupancy() {
     const grid = Array(GRID_W * GRID_H).fill(null);
@@ -83,7 +84,7 @@
     $('buildWarning').textContent=validate()||'连接完成，可以出发！'; $('startBtn').disabled=!!validate();
     $('undoBtn').disabled=!history.length;$('redoBtn').disabled=!future.length;
     $('levelHint').textContent=levels[levelIndex].hint; $('starGoal').textContent=`本关收藏 ${starMarks(starProgress[levelIndex])} · 到家即可通关`; 
-    $('selection').textContent=selectedPart==='cockpit'?'点一个格子作为双人舱左上角':`已选：${selectedPart==='erase'?'拆除':partName(selectedPart)} · ${selectedRotation*90}°`;
+    $('selection').textContent=selectedPart==='cockpit'?'点一个格子作为双人舱左上角':`已选：${selectedPart==='erase'?'拆除':partName(selectedPart)} · ${directionHint()}`;
     drawPartList();
   }
   function drawPartList() {
@@ -98,7 +99,7 @@
       if(t==='cockpit'&&!blueprint.cockpit){const icons=document.createElement('span');icons.className='waitingFriends';for(const name of ['naidan','naidou']){const img=document.createElement('img');img.src=name==='naidan'?'assets/naidan.png':'assets/naidou.png';img.alt=name==='naidan'?'奶蛋':'奶豆';icons.appendChild(img);}b.prepend(icons);b.classList.add('unplaced');}
       if(!['erase','cockpit'].includes(t)){const icon=document.createElement('canvas');icon.width=60;icon.height=50;const ic=icon.getContext('2d');ic.translate(30,26);ic.scale(1.1,1.1);NaiArt.part(ic,{type:t,rotation:0},0,0);b.prepend(icon);}
       b.disabled=!['erase','cockpit'].includes(t)&&available===0;
-      b.addEventListener('click',()=>{selectedPart=t;$('selection').textContent=`当前：${t==='erase'?'拆除':partName(t)}；方向 ${selectedRotation*90}°`;drawPartList();});
+      b.addEventListener('click',()=>{selectedPart=t;$('selection').textContent=`当前：${t==='erase'?'拆除':partName(t)} · ${directionHint()}`;drawPartList();});
       host.appendChild(b);
     }
   }
@@ -149,6 +150,16 @@
     lastStarCount=0;fuel=1;elapsed=0;cameraX=levels[levelIndex].spawn.x-105;fanOn=false;autoDrive=false;overview=false;accumulator=0;
     $('fanBtn').textContent='风扇 F · 关';
     $('fanBtn').disabled=!countType('fan');$('rocketBtn').disabled=!countType('rocket');$('ventBtn').disabled=!countType('balloon');
+    updateDriveButtons();
+  }
+  function updateDriveButtons(){
+    const powered=sim.attachedCount('motor')>0&&sim.attachedCount('wheel')>0;
+    for(const id of ['leftBtn','rightBtn','autoBtn'])$(id).disabled=!powered;
+    $('brakeBtn').disabled=!sim.attachedCount('wheel');
+    $('autoBtn').textContent=powered?(autoDrive?'发动机 · 开':'发动机 · 关'):'无轮式动力';
+    $('fanBtn').disabled=!sim.attachedCount('fan');$('rocketBtn').disabled=!sim.attachedCount('rocket')||fuel<=0;
+    const balloons=sim.attachedCount('balloon');$('ventBtn').disabled=!balloons;$('ventBtn').textContent=balloons?`放气 V · 余 ${balloons} 只`:countType('balloon')?'气球已放完':'未装气球';
+    $('damageText').textContent=sim.items.some(p=>!p.attached)?`零件脱落 ${sim.items.filter(p=>!p.attached).length} · 仍可继续抵达终点`:sim.items.some(p=>p.health<100)?'车架受损 · 放慢落地速度':powered?'轮式传动 · 松开动力仍会惯性滑行':'无轮式动力 · 山坡靠重力，平地需风扇或火箭';
   }
   function start() {
     if(state==='build') {const error=validate();if(error){$('buildWarning').textContent=error;return;}}
@@ -206,7 +217,7 @@
     $('fuelBar').style.width=`${Math.round(fuel*100)}%`;
     if(Math.floor(elapsed*10)!==Math.floor((elapsed-NaiPhysics.STEP/1000)*10)){
       const route=levels[levelIndex].trackStyle==='switchback'?(p.y<330?'上层 →':p.y<525?'中层 ← 请向左':'谷底 → 请向右'):`距终点 ${Math.max(0,Math.round((levels[levelIndex].goal.x-p.x)/10))} 米`;
-      $('statusText').textContent=`奶蛋 ✓  奶豆 ✓  ·  ${elapsed.toFixed(1)} 秒  ·  ${route}  ·  ${starMarks(sim.collected)}`;
+      $('statusText').textContent=`奶蛋 ✓  奶豆 ✓  ·  ${elapsed.toFixed(1)} 秒  ·  ${route}  ·  ${starMarks(sim.collected)}`;updateDriveButtons();
     }
   }
   function roundedRect(x,y,w,h,r,fill,stroke=null){
@@ -232,9 +243,10 @@
     // Axles explicitly connect wheel centres to the rigid frame.
     ctx.strokeStyle='#8a7a53';ctx.lineWidth=5;
     for(const j of sim.joints){const pt=M.Constraint.pointAWorld(j);ctx.beginPath();ctx.moveTo(pt.x,pt.y);ctx.lineTo(c.position.x,c.position.y+20);ctx.stroke();}
-    for(const p of car.items)if(p.type!=='wheel'){const pt=sim.mount(p);NaiArt.part(ctx,p,pt.x,pt.y,c.angle,sim.time,p.type==='fan'?fanOn:p.type==='rocket'?controls.rocket&&fuel>0:autoDrive||controls.right||controls.left);}
+    for(const p of car.items)if(p.type!=='wheel'){const pt=sim.mount(p);NaiArt.part(ctx,p,pt.x,pt.y,sim.angle(p),sim.time,p.attached&&(p.type==='fan'?fanOn:p.type==='rocket'?controls.rocket&&fuel>0:autoDrive||controls.right||controls.left));}
     NaiArt.cabin(ctx,sim.cabin.position.x,sim.cabin.position.y,c.angle,sim.motion);
     for(const w of sim.wheels)NaiArt.part(ctx,{type:'wheel'},w.position.x,w.position.y,w.angle);
+    for(const e of sim.damageEvents){const t=sim.time-e.time;ctx.save();ctx.globalAlpha=Math.max(0,1-t/1.2);ctx.fillStyle=e.type==='pop'?'#fff1cb':'#bd854c';for(let i=0;i<7;i++){const a=i*2.4;ctx.fillRect(e.x+Math.cos(a)*t*55,e.y+Math.sin(a)*t*45+t*t*30,4,4);}ctx.restore();}
   }
   function buildOrigin(){const l=levels[levelIndex];return {x:l.spawn.x,y:l.spawn.groundY-GRID_H*TILE-5};}
   function drawBuildPreview(){
@@ -282,9 +294,10 @@
     el.addEventListener('pointerdown',e=>{if(state!=='test')return;e.preventDefault();tone(220,.03);el.setPointerCapture(e.pointerId);controls[key]=true;el.classList.add('engaged');});
     for(const ev of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(ev,()=>{controls[key]=false;el.classList.remove('engaged');});
   }
-  bindHold('leftBtn','left');bindHold('rightBtn','right');bindHold('rocketBtn','rocket');bindHold('brakeBtn','brake');bindHold('ventBtn','vent');
+  bindHold('leftBtn','left');bindHold('rightBtn','right');bindHold('rocketBtn','rocket');bindHold('brakeBtn','brake');
+  $('ventBtn').onclick=()=>{if(state==='test'&&sim.popBalloon()){tone(160,.06);updateDriveButtons();}};
   $('fanBtn').addEventListener('click',()=>{if(state!=='test')return;fanOn=!fanOn;$('fanBtn').textContent=fanOn?'风扇 F · 开':'风扇 F · 关';});
-  $('rotateBtn').addEventListener('click',()=>{selectedRotation=(selectedRotation+1)%4;$('rotateBtn').textContent=`旋转 ${selectedRotation*90}°`;$('selection').textContent=`当前：${partName(selectedPart)}；方向 ${selectedRotation*90}°`;});
+  $('rotateBtn').addEventListener('click',()=>{selectedRotation=(selectedRotation+1)%4;$('rotateBtn').textContent=`旋转 ${selectedRotation*90}°`;$('selection').textContent=`当前：${partName(selectedPart)} · ${directionHint()}`;});
   $('startBtn').addEventListener('click',start);$('editBtn').addEventListener('click',edit);$('retryBtn').addEventListener('click',retry);
   $('resetBtn').addEventListener('click',resetBlueprint);$('saveBtn').addEventListener('click',saveBlueprint);$('loadBtn').addEventListener('click',loadBlueprint);
   $('modalEdit').addEventListener('click',edit);$('modalRetry').addEventListener('click',retry);
@@ -299,7 +312,7 @@
   $('autoBtn').onclick=()=>{if(state!=='test')return;autoDrive=!autoDrive;$('autoBtn').textContent=autoDrive?'发动机 · 开':'发动机 · 关';tone(260,.05);};
   $('fullscreenBtn').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('app').requestFullscreen();}catch(_){$('fullscreenBtn').textContent='窗口模式';$('fullscreenBtn').title='当前浏览器不支持全屏，窗口内可直接游玩';}};
   document.addEventListener('fullscreenchange',()=>{$('fullscreenBtn').textContent=document.fullscreenElement?'退出全屏':'全屏';resize();});
-  $('controlHelp').textContent=matchMedia('(pointer: coarse)').matches?'点选零件，再点格子；驾驶时可同时按多个按钮':'鼠标拼装 · A / D 驱动 · B 刹车 · 空格点火 · Esc 暂停';
+  $('controlHelp').textContent=matchMedia('(pointer: coarse)').matches?'点选零件，再点格子；驾驶时可同时按多个按钮':'鼠标拼装 · A / D 驱动 · B 刹车 · 空格点火 · V 放气 · Esc 暂停';
   window.addEventListener('keydown',e=>{
     if(e.target.matches('select,input,textarea'))return;
     if(!$('home').classList.contains('hidden'))return;
@@ -312,7 +325,7 @@
     if(e.code==='KeyM'&&!e.repeat&&['build','test','paused'].includes(state)){$('mapBtn').click();return;}
     if(['ArrowLeft','ArrowRight','Space','ArrowDown'].includes(e.code))e.preventDefault();
     if(state!=='test'){if(e.code==='Escape'&&state==='paused')$('pauseBtn').click();return;}
-    if(e.code==='KeyB'||e.code==='ArrowDown')controls.brake=true;if(e.code==='KeyV')controls.vent=true;
+    if(e.code==='KeyB'||e.code==='ArrowDown')controls.brake=true;if(e.code==='KeyV'&&!e.repeat)$('ventBtn').click();
     if(e.code==='ArrowLeft'||e.code==='KeyA')controls.left=true;
     if(e.code==='ArrowRight'||e.code==='KeyD')controls.right=true;
     if(e.code==='Space')controls.rocket=true;

@@ -8,11 +8,8 @@ const types=Object.fromEntries(config.parts.types.map(p=>[p.id,p]));
 const newSim=(i=0,b)=>new P.Simulation(config,i,b||config.levels.levels[i].example);
 function test(name,fn){fn();results.push({name,status:'PASS'});console.log('PASS',name);}
 function drive(s,fn,max=7200){for(let n=0;n<max&&s.status==='test';n++)s.step(fn(s));return s;}
-function solutionInput(i,route=0){let phase=0;return s=>{
- if(i===1){if(phase===0&&s.cabin.position.y>330)phase=1;if(phase===1&&s.cabin.position.y>525)phase=2;return {right:phase!==1,left:phase===1};}
- return {right:true,fan:(i===2&&route===0)||i===3,rocket:i===4&&s.cabin.position.x>650&&s.cabin.position.x<810,vent:i===3&&s.cabin.position.y<250};
-};}
-for(let i=0;i<5;i++)test('Level '+(i+1)+' real-force solution',()=>{
+const solutionInput=(i,route=0)=>require('./solution_controls')(config.levels.levels[i],route);
+for(let i=0;i<20;i++)test('Level '+(i+1)+' real-force solution',()=>{
  const s=drive(newSim(i),solutionInput(i));
  assert.equal(s.status,'success');assert(s.maxAxleError<1);results.push({level:i+1,seconds:+s.time.toFixed(3),axleError:+s.maxAxleError.toFixed(5),candy:s.candy,blueprint:clone(s.blueprint)});
 });
@@ -42,9 +39,22 @@ test('Stock, cabin bounds, malformed save rejected',()=>{const b=clone(base);b.c
 test('Independent passenger reactions',()=>{const s=newSim();drive(s,()=>({right:true}),90);assert.notEqual(s.motion[0].x,s.motion[1].x);assert(s.motion.every(m=>Math.abs(m.x)<=3));});
 test('Finish does not require collecting stars',()=>{const cfg=clone(config);cfg.levels.levels[0].stars.forEach(p=>p.y=-100);const s=new P.Simulation(cfg,0,cfg.levels.levels[0].example);drive(s,()=>({right:true}));assert.equal(s.status,'success');assert.equal(s.collected.filter(Boolean).length,0);});
 test('All three rewards on every map are attainable',()=>{
- for(let i=0;i<5;i++){const masks=[];for(let route=0;route<(i===2?2:1);route++){const s=drive(newSim(i),solutionInput(i,route));assert.equal(s.status,'success');masks.push(s.collected);}assert([0,1,2].every(j=>masks.some(m=>m[j])),'Unreachable reward in level '+(i+1));}
+ for(let i=0;i<20;i++){const masks=[];for(let route=0;route<([2,14].includes(i)?2:1);route++){const s=drive(newSim(i),solutionInput(i,route));assert.equal(s.status,'success');masks.push(s.collected);}assert([0,1,2].every(j=>masks.some(m=>m[j])),'Unreachable reward in level '+(i+1));}
 });
 test('Retry restores all three world stars',()=>{const s=drive(newSim(),()=>({right:true}));assert(s.collected.every(Boolean));assert(newSim().collected.every(v=>!v));});
 test('Thirty restart cycles stay finite and stable',()=>{for(let i=0;i<30;i++){const s=drive(newSim(),()=>({right:true}),480);assert(Number.isFinite(s.chassis.position.x+s.chassis.angle));assert(s.maxAxleError<1);M.Composite.clear(s.engine.world,false);M.Engine.clear(s.engine);}});
+test('Unpowered controls add no motion on flat ground',()=>{const b=clone(base);b.parts=b.parts.filter(p=>p.type!=='motor');const s=newSim(0,b),idle=newSim(0,b),x=s.cabin.position.x;drive(s,()=>({right:true,left:false}),1200);drive(idle,()=>({}),1200);assert(Math.abs(s.cabin.position.x-idle.cabin.position.x)<1e-8);assert(Math.abs(s.cabin.position.x-x)<4);assert.equal(s.attachedCount('motor'),0);});
+test('The same unpowered cart rolls down a real slope',()=>{const s=drive(newSim(13),()=>({}));assert.equal(s.status,'success');assert(s.collected.every(Boolean));});
+test('One vent press pops exactly one balloon and never refills it',()=>{const s=newSim(3);s.engine.gravity.scale=0;M.Composite.remove(s.engine.world,s.ground);s.step({vent:true});assert.equal(s.attachedCount('balloon'),1);drive(s,()=>({vent:true}),20);assert.equal(s.attachedCount('balloon'),1);s.step({});assert.equal(s.attachedCount('balloon'),1);s.step({vent:true});assert.equal(s.attachedCount('balloon'),0);assert.equal(s.popBalloon(),false);});
+function wallImpact(speed){const s=newSim();s.engine.gravity.scale=0;M.Composite.remove(s.engine.world,s.ground);M.Composite.add(s.engine.world,M.Bodies.rectangle(450,250,40,500,{isStatic:true}));for(const b of [s.chassis,...s.wheels])M.Body.setVelocity(b,{x:speed,y:0});return drive(s,()=>({}),240);}
+test('Gentle wall contact does not break parts',()=>{const s=wallImpact(5);assert(s.items.every(p=>p.attached&&p.health===100));});
+test('Moderate impact damages connections before fracture',()=>{const s=wallImpact(20);assert(s.items.some(p=>p.health<100));assert(s.items.every(p=>p.attached));});
+test('Severe real collision detaches motor and wheel without auto-failing',()=>{const s=wallImpact(35);assert.equal(s.attachedCount('motor'),0);assert.equal(s.attachedCount('wheel'),1);assert.equal(s.status,'test');assert(s.maxAxleError<1);assert(s.items.filter(p=>!p.attached).every(p=>M.Composite.allBodies(s.engine.world).includes(p.body)));});
+test('Fracture keeps part positions and conserves linear momentum',()=>{const s=newSim(),motor=s.items.find(p=>p.type==='motor'),before=s.items.map(p=>({...p.body.position}));M.Body.setVelocity(s.chassis,{x:4,y:-3});M.Body.setAngularVelocity(s.chassis,.04);const mass=s.chassis.mass,momentum={x:mass*s.chassis.velocity.x,y:mass*s.chassis.velocity.y};s.detach(motor);assert(Math.abs(s.chassis.mass+motor.body.mass-mass)<1e-8);for(const axis of ['x','y'])assert(Math.abs(s.chassis.mass*s.chassis.velocity[axis]+motor.body.mass*motor.body.velocity[axis]-momentum[axis])<1e-7);s.items.forEach((p,i)=>assert(Math.hypot(p.body.position.x-before[i].x,p.body.position.y-before[i].y)<1e-7));assert.equal(s.attachedCount('motor'),0);});
+test('Broken support releases its unsupported wheel',()=>{const s=newSim(),wood=s.items.find(p=>p.type==='wood'&&p.x===1);s.detach(wood);assert(!s.items.find(p=>p.type==='wheel'&&p.x===0).attached);assert(s.items.find(p=>p.type==='wheel'&&p.x===3).attached);assert.equal(s.joints.length,1);});
+test('Detached fan stops propelling the cabin',()=>{const s=newSim(2),fan=s.items.find(p=>p.type==='fan');s.detach(fan);M.Composite.remove(s.engine.world,s.ground);s.engine.gravity.scale=0;drive(s,()=>({fan:true}),90);assert(Math.abs(s.chassis.velocity.x)<.01);});
+test('Fracture remains stable through repeated rotated splits',()=>{const s=newSim(4);M.Body.setAngle(s.chassis,.65);for(const p of [...s.items]){if(p.attached)s.detach(p);for(let n=0;n<10;n++)s.step({});assert(Number.isFinite(s.chassis.position.x+s.chassis.angle));}assert.equal(s.joints.length,0);assert.deepEqual(s.passengers,['naidan','naidou']);});
+test('Damaged vehicle can still finish with both passengers',()=>{const s=newSim();s.detach(s.items.find(p=>p.type==='motor'));const g=s.level.goal,delta={x:g.x-s.cabin.position.x,y:g.y-65-s.cabin.position.y};M.Body.translate(s.chassis,delta);for(const w of s.wheels)M.Body.translate(w,delta);s.step({});assert.equal(s.status,'success');});
+test('Retry restores lost parts and balloons from immutable blueprint',()=>{const s=newSim(3),original=clone(s.blueprint);s.popBalloon();s.detach(s.items.find(p=>p.type==='fan'));const retry=newSim(3,original);assert.equal(retry.attachedCount('balloon'),2);assert.equal(retry.attachedCount('fan'),1);assert.deepEqual(s.blueprint,original);});
 const out=path.join(__dirname,'../test-results');fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'physics.json'),JSON.stringify({engine:'Matter.js 0.20.0',fixedStepHz:120,passed:results.filter(r=>r.status==='PASS').length,results},null,2));
 console.log('All physics checks passed.');

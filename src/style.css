@@ -65,3 +65,8 @@ html{min-height:100%;background:#263f35}body{min-height:100vh;min-height:100dvh}
 .partList button[data-part=cockpit].unplaced{padding:46px 3px 4px;font-size:11px}
 @media(max-height:530px), (orientation:portrait) and (max-width:900px){.waitingFriends{height:33px}.waitingFriends img{height:32px;width:26px}.partList button[data-part=cockpit].unplaced{padding:36px 2px 3px;font-size:9px}}
 @media(orientation:portrait) and (max-width:350px){.waitingFriends{height:28px}.waitingFriends img{height:27px;width:22px}.partList button[data-part=cockpit].unplaced{padding-top:30px;font-size:8px}}
+
+/* A separate one-shot balloon control, clear of the driving fingers. */
+.ventAction{position:absolute;right:20px;bottom:104px;min-width:150px;min-height:76px;border-radius:22px;background:linear-gradient(#fff0bc,#e0b36e);font-size:16px;touch-action:manipulation;box-shadow:0 4px 0 #987243}
+.damageText{position:absolute;left:20px;top:78px;padding:6px 10px;border-radius:8px;background:#fff1d2c9;color:#78533a;font-size:11px;pointer-events:none;max-width:62%}
+@media(max-height:530px), (orientation:portrait) and (max-width:900px){.ventAction{right:10px;bottom:72px;min-width:135px;min-height:62px;font-size:13px}.damageText{left:10px;top:57px;font-size:9px;max-width:65%;padding:4px 7px}}
