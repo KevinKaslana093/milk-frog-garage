@@ -1,6 +1,6 @@
 {
   "name": "milk-frog-garage",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "description": "奶蛋与奶豆同车的原创物理拼装游戏，基于用户交接原型继续开发",
   "scripts": {

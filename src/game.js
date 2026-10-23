@@ -1,5 +1,5 @@
 /*
- * 《奶蛙造车记》V0.4.0 场景拼装版 — based on supplied prototype
+ * 《奶蛙造车记》V0.4.1 场景拼装版 — based on supplied prototype
  * Local Matter.js 0.20; character sprites derived from user supplied references.
  * Goal: an editable blueprint + a physically-driven test cart.
  */
@@ -34,7 +34,8 @@
   let levelIndex = 0, blueprint = NaiPhysics.emptyBlueprint(), state = 'build';
   let selectedPart = 'cockpit', selectedRotation = 0;
   let engine = null, car = null, wheelBodies = [], groundBodies = [], goalBody = null;
-  let cameraX = 0, last = 0, accumulator = 0, now = 0, fuel = 1, fanOn = false;
+  let cameraX = 0, last = 0, accumulator = 0, now = 0, fuel = 1, fanStates = [];
+  const fanKeys=['F','G','H'],fanColors=['#3d806a','#b47a31','#567da7'];
   let sim = null, history = [], future = [], scores = {}, muted = false, audio = null;
   let elapsed = 0, status = '', unlocked = 1;
   const controls = {left:false,right:false,rocket:false,brake:false,vent:false};
@@ -147,27 +148,32 @@
   function makeCar(){
     sim=new NaiPhysics.Simulation(data,levelIndex,blueprint);engine=sim.engine;
     car={chassis:sim.chassis,wheels:sim.wheels,jointList:sim.joints,items:sim.items,passengers:sim.passengers};wheelBodies=sim.wheels;
-    lastStarCount=0;fuel=1;elapsed=0;cameraX=levels[levelIndex].spawn.x-105;fanOn=false;autoDrive=false;overview=false;accumulator=0;
-    $('fanBtn').textContent='风扇 F · 关';
-    $('fanBtn').disabled=!countType('fan');$('rocketBtn').disabled=!countType('rocket');$('ventBtn').disabled=!countType('balloon');
+    lastStarCount=0;fuel=1;elapsed=0;cameraX=levels[levelIndex].spawn.x-105;fanStates=sim.items.filter(p=>p.type==='fan').map(()=>false);autoDrive=false;overview=false;accumulator=0;
+    const host=$('fanControls');host.replaceChildren();
+    for(const p of sim.items.filter(p=>p.type==='fan')){const b=document.createElement('button');b.id='fanBtn-'+p.fanIndex;b.className='driveBtn fanControl';b.style.setProperty('--fan-color',fanColors[p.fanIndex%fanColors.length]);b.onclick=()=>toggleFan(p.fanIndex);host.appendChild(b);}
+    $('rocketBtn').disabled=!countType('rocket');$('ventBtn').disabled=!countType('balloon');
     updateDriveButtons();
+  }
+  function toggleFan(i){if(state!=='test'||!sim.items.some(p=>p.type==='fan'&&p.fanIndex===i&&p.attached))return;fanStates[i]=!fanStates[i];updateFanButtons();tone(fanStates[i]?440+i*100:260,.05);}
+  function updateFanButtons(){
+    for(const p of sim.items.filter(p=>p.type==='fan')){const i=p.fanIndex,b=$('fanBtn-'+i);if(!p.attached)fanStates[i]=false;const on=fanStates[i],label=p.attached?(on?'开':'关'):'脱落';b.disabled=!p.attached;b.classList.toggle('engaged',on);b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',`风扇 ${i+1}，${label}，快捷键 ${fanKeys[i]} 或 ${i+1}`);b.textContent=`风扇 ${i+1} ${['→','↓','←','↑'][p.rotation]}\n${fanKeys[i]} / ${i+1} · ${label}`;}
   }
   function updateDriveButtons(){
     const powered=sim.attachedCount('motor')>0&&sim.attachedCount('wheel')>0;
     for(const id of ['leftBtn','rightBtn','autoBtn'])$(id).disabled=!powered;
     $('brakeBtn').disabled=!sim.attachedCount('wheel');
     $('autoBtn').textContent=powered?(autoDrive?'发动机 · 开':'发动机 · 关'):'无轮式动力';
-    $('fanBtn').disabled=!sim.attachedCount('fan');$('rocketBtn').disabled=!sim.attachedCount('rocket')||fuel<=0;
+    updateFanButtons();$('rocketBtn').disabled=!sim.attachedCount('rocket')||fuel<=0;
     const balloons=sim.attachedCount('balloon');$('ventBtn').disabled=!balloons;$('ventBtn').textContent=balloons?`放气 V · 余 ${balloons} 只`:countType('balloon')?'气球已放完':'未装气球';
     $('damageText').textContent=sim.items.some(p=>!p.attached)?`零件脱落 ${sim.items.filter(p=>!p.attached).length} · 仍可继续抵达终点`:sim.items.some(p=>p.health<100)?'车架受损 · 放慢落地速度':powered?'轮式传动 · 松开动力仍会惯性滑行':'无轮式动力 · 山坡靠重力，平地需风扇或火箭';
   }
   function start() {
     if(state==='build') {const error=validate();if(error){$('buildWarning').textContent=error;return;}}
-    resetControls();makeWorld();makeCar();state='test';tone(660);setVisibleState();info('长按驱动轮子，F 开关风扇，空格按住点火');
+    resetControls();makeWorld();makeCar();state='test';tone(660);setVisibleState();info('长按驱动轮子，F/G/H 或 1/2/3 独立开关风扇');
   }
   function edit() {state='build';overview=false;cameraX=0;sim=null;car=null;resetControls();$('modal').classList.add('hidden');setVisibleState();drawGrid();}
   function retry() {resetControls();$('modal').classList.add('hidden');start();}
-  function resetControls(){for(const k in controls)controls[k]=false;document.querySelectorAll('.engaged').forEach(e=>e.classList.remove('engaged'));}
+  function resetControls(){for(const k in controls)controls[k]=false;document.querySelectorAll('.engaged:not(.fanControl)').forEach(e=>e.classList.remove('engaged'));}
   function setVisibleState() {
     $('app').dataset.state=state;
     $('introOverlay').classList.toggle('hidden',state!=='intro');$('starGoal').classList.toggle('hidden',!['build','intro'].includes(state));$('tourBtn').classList.toggle('hidden',state!=='build');
@@ -208,7 +214,7 @@
   function changeLevel(i){overview=false;autoDrive=false;levelIndex=Math.min(Math.max(i,0),levels.length-1);blueprint=NaiPhysics.emptyBlueprint();selectedPart='cockpit';selectedRotation=0;$('rotateBtn').textContent='旋转 0°';history=[];future=[];state='build';cameraX=0;car=null;sim=null;$('modal').classList.add('hidden');resetControls();setVisibleState();drawGrid();info('准备造车');refreshSelect();beginIntro();}
   function tick(){
     if(state!=='test'||!sim)return;
-    sim.step({...controls,right:controls.right||(autoDrive&&!controls.left&&!controls.brake),fan:fanOn});elapsed=sim.time;fuel=sim.fuel;
+    sim.step({...controls,right:controls.right||(autoDrive&&!controls.left&&!controls.brake),fans:fanStates});elapsed=sim.time;fuel=sim.fuel;
     const n=sim.collected.filter(Boolean).length;if(n>lastStarCount){tone(740+n*130,.14);lastStarCount=n;}
     if(sim.status==='failed'){fail('奶蛋和奶豆一起掉出了安全区域。');return;}
     if(sim.status==='success'){succeed();return;}
@@ -243,15 +249,18 @@
     // Axles explicitly connect wheel centres to the rigid frame.
     ctx.strokeStyle='#8a7a53';ctx.lineWidth=5;
     for(const j of sim.joints){const pt=M.Constraint.pointAWorld(j);ctx.beginPath();ctx.moveTo(pt.x,pt.y);ctx.lineTo(c.position.x,c.position.y+20);ctx.stroke();}
-    for(const p of car.items)if(p.type!=='wheel'){const pt=sim.mount(p);NaiArt.part(ctx,p,pt.x,pt.y,sim.angle(p),sim.time,p.attached&&(p.type==='fan'?fanOn:p.type==='rocket'?controls.rocket&&fuel>0:autoDrive||controls.right||controls.left));}
+    for(const p of car.items)if(p.type!=='wheel'){const pt=sim.mount(p);NaiArt.part(ctx,p,pt.x,pt.y,sim.angle(p),sim.time,p.attached&&(p.type==='fan'?fanStates[p.fanIndex]:p.type==='rocket'?controls.rocket&&fuel>0:autoDrive||controls.right||controls.left));}
     NaiArt.cabin(ctx,sim.cabin.position.x,sim.cabin.position.y,c.angle,sim.motion);
     for(const w of sim.wheels)NaiArt.part(ctx,{type:'wheel'},w.position.x,w.position.y,w.angle);
+    for(const p of sim.items.filter(p=>p.type==='fan')){const pt=sim.mount(p);drawFanBadge(pt.x,pt.y,p.fanIndex,p.attached&&fanStates[p.fanIndex],!p.attached);}
     for(const e of sim.damageEvents){const t=sim.time-e.time;ctx.save();ctx.globalAlpha=Math.max(0,1-t/1.2);ctx.fillStyle=e.type==='pop'?'#fff1cb':'#bd854c';for(let i=0;i<7;i++){const a=i*2.4;ctx.fillRect(e.x+Math.cos(a)*t*55,e.y+Math.sin(a)*t*45+t*t*30,4,4);}ctx.restore();}
   }
   function buildOrigin(){const l=levels[levelIndex];return {x:l.spawn.x,y:l.spawn.groundY-GRID_H*TILE-5};}
+  function drawFanBadge(x,y,i,on=false,lost=false){ctx.save();ctx.translate(x-12,y-13);ctx.fillStyle=lost?'#7b7b73':fanColors[i%fanColors.length];ctx.strokeStyle=on?'#fff5b0':'#f4f0d5';ctx.lineWidth=on?2:1;ctx.beginPath();ctx.arc(0,0,7,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(i+1),0,.5);ctx.restore();}
   function drawBuildPreview(){
     const o=buildOrigin();for(const p of blueprint.parts)NaiArt.part(ctx,p,o.x+(p.x+.5)*34,o.y+(p.y+.5)*34);
     if(blueprint.cockpit)NaiArt.cabin(ctx,o.x+(blueprint.cockpit.x+1)*34,o.y+(blueprint.cockpit.y+1)*34,0);
+    blueprint.parts.filter(p=>p.type==='fan').forEach((p,i)=>drawFanBadge(o.x+(p.x+.5)*34,o.y+(p.y+.5)*34,i));
   }
   function buildPose(){const l=levels[levelIndex],z=Math.max(1.5,45*W/(canvas.clientWidth*TILE)),top=canvas.clientHeight<280?29:62;return {x:l.spawn.x-100,y:canvas.clientHeight<500?buildOrigin().y-(top*W/canvas.clientWidth)/z:l.spawn.groundY-(H-125)/z,z};}
   function starMarks(mask){return [0,1,2].map(i=>mask?.[i]?'★':'☆').join('');}
@@ -296,7 +305,6 @@
   }
   bindHold('leftBtn','left');bindHold('rightBtn','right');bindHold('rocketBtn','rocket');bindHold('brakeBtn','brake');
   $('ventBtn').onclick=()=>{if(state==='test'&&sim.popBalloon()){tone(160,.06);updateDriveButtons();}};
-  $('fanBtn').addEventListener('click',()=>{if(state!=='test')return;fanOn=!fanOn;$('fanBtn').textContent=fanOn?'风扇 F · 开':'风扇 F · 关';});
   $('rotateBtn').addEventListener('click',()=>{selectedRotation=(selectedRotation+1)%4;$('rotateBtn').textContent=`旋转 ${selectedRotation*90}°`;$('selection').textContent=`当前：${partName(selectedPart)} · ${directionHint()}`;});
   $('startBtn').addEventListener('click',start);$('editBtn').addEventListener('click',edit);$('retryBtn').addEventListener('click',retry);
   $('resetBtn').addEventListener('click',resetBlueprint);$('saveBtn').addEventListener('click',saveBlueprint);$('loadBtn').addEventListener('click',loadBlueprint);
@@ -312,7 +320,7 @@
   $('autoBtn').onclick=()=>{if(state!=='test')return;autoDrive=!autoDrive;$('autoBtn').textContent=autoDrive?'发动机 · 开':'发动机 · 关';tone(260,.05);};
   $('fullscreenBtn').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('app').requestFullscreen();}catch(_){$('fullscreenBtn').textContent='窗口模式';$('fullscreenBtn').title='当前浏览器不支持全屏，窗口内可直接游玩';}};
   document.addEventListener('fullscreenchange',()=>{$('fullscreenBtn').textContent=document.fullscreenElement?'退出全屏':'全屏';resize();});
-  $('controlHelp').textContent=matchMedia('(pointer: coarse)').matches?'点选零件，再点格子；驾驶时可同时按多个按钮':'鼠标拼装 · A / D 驱动 · B 刹车 · 空格点火 · V 放气 · Esc 暂停';
+  $('controlHelp').textContent=matchMedia('(pointer: coarse)').matches?'点选零件，再点格子；风扇按车上编号分别开关':'鼠标拼装 · A / D 驱动 · B 刹车 · 空格点火 · F/G/H 或 1/2/3 风扇 · V 放气';
   window.addEventListener('keydown',e=>{
     if(e.target.matches('select,input,textarea'))return;
     if(!$('home').classList.contains('hidden'))return;
@@ -329,7 +337,7 @@
     if(e.code==='ArrowLeft'||e.code==='KeyA')controls.left=true;
     if(e.code==='ArrowRight'||e.code==='KeyD')controls.right=true;
     if(e.code==='Space')controls.rocket=true;
-    if(e.code==='KeyF'&&!e.repeat&&state==='test'){$('fanBtn').click();}
+    if(!e.repeat){const fanKey=['KeyF','KeyG','KeyH'].indexOf(e.code),numberKey=['Digit1','Digit2','Digit3'].indexOf(e.code),padKey=['Numpad1','Numpad2','Numpad3'].indexOf(e.code);const i=Math.max(fanKey,numberKey,padKey);if(i>=0){e.preventDefault();toggleFan(i);}}
     if(e.code==='Escape'&&['test','paused'].includes(state))$('pauseBtn').click();
   });
   window.addEventListener('keyup',e=>{

@@ -70,3 +70,7 @@ html{min-height:100%;background:#263f35}body{min-height:100vh;min-height:100dvh}
 .ventAction{position:absolute;right:20px;bottom:104px;min-width:150px;min-height:76px;border-radius:22px;background:linear-gradient(#fff0bc,#e0b36e);font-size:16px;touch-action:manipulation;box-shadow:0 4px 0 #987243}
 .damageText{position:absolute;left:20px;top:78px;padding:6px 10px;border-radius:8px;background:#fff1d2c9;color:#78533a;font-size:11px;pointer-events:none;max-width:62%}
 @media(max-height:530px), (orientation:portrait) and (max-width:900px){.ventAction{right:10px;bottom:72px;min-width:135px;min-height:62px;font-size:13px}.damageText{left:10px;top:57px;font-size:9px;max-width:65%;padding:4px 7px}}
+
+.fanControls{display:flex;gap:8px}.fanControl{white-space:pre-line;border-color:var(--fan-color);line-height:1.4}.fanControl.engaged{background:var(--fan-color);color:#fff;text-shadow:none}
+@media(max-height:530px), (orientation:portrait) and (max-width:900px){.fanControls{gap:5px}.powerGroup .fanControl{min-width:64px;padding:5px;font-size:10px}}
+@media(orientation:landscape) and (max-width:650px), (orientation:portrait) and (max-height:650px){.controls>.driveGroup:first-child .driveBtn{min-width:59px;padding:5px}.powerGroup .driveBtn{min-width:60px;padding:5px}.driveGroup,.fanControls{gap:5px}}

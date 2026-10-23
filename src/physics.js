@@ -58,6 +58,7 @@
       this.cabin=Bodies.rectangle(ox+(cp.x+1)*TILE,oy+(cp.y+1)*TILE,63,63,{density:defs.cockpit.density,label:'cockpit-piece'});
       const frame=[this.cabin];
       this.items=bp.parts.map(p=>({...p,worldX:ox+(p.x+.5)*TILE,worldY:oy+(p.y+.5)*TILE}));
+      this.items.filter(p=>p.type==='fan').forEach((p,i)=>p.fanIndex=i);
       for(const p of this.items)if(p.type!=='wheel'){p.body=Bodies.rectangle(p.worldX,p.worldY,27,p.type==='wood'?22:27,{density:defs[p.type].density,label:p.type+'-piece'});frame.push(p.body);}
       this.chassis=Body.create({parts:frame,friction:.65,frictionAir:.0015,restitution:.02,collisionFilter:{group},label:'vehicle'});
       for(const p of this.chassis.parts)p.collisionFilter.group=group;
@@ -137,7 +138,7 @@
       for(const p of this.items){
         const a=p.rotation*Math.PI/2+this.angle(p);
         if(p.type==='balloon'&&!p.popped)this.force(p,0,-defs.balloon.lift);
-        if(p.type==='fan'&&p.attached&&input.fan)this.force(p,Math.cos(a)*defs.fan.thrust,Math.sin(a)*defs.fan.thrust);
+        if(p.type==='fan'&&p.attached&&input.fans?.[p.fanIndex]===true)this.force(p,Math.cos(a)*defs.fan.thrust,Math.sin(a)*defs.fan.thrust);
         if(p.type==='rocket'&&p.attached&&input.rocket&&this.fuel>0)this.force(p,Math.cos(a)*defs.rocket.thrust,Math.sin(a)*defs.rocket.thrust);
       }
       if(input.rocket&&this.items.some(p=>p.type==='rocket'))this.fuel=Math.max(0,this.fuel-STEP/defs.rocket.fuelMs);

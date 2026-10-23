@@ -1,7 +1,7 @@
 {
   "engine": "Matter.js 0.20.0",
   "fixedStepHz": 120,
-  "passed": 58,
+  "passed": 62,
   "results": [
     {
       "level": 1,
@@ -1696,6 +1696,22 @@
     },
     {
       "name": "Retry restores lost parts and balloons from immutable blueprint",
+      "status": "PASS"
+    },
+    {
+      "name": "Two opposite fans produce independent forces, even with duplicate imported IDs",
+      "status": "PASS"
+    },
+    {
+      "name": "Fan combinations apply force only at the selected mounts",
+      "status": "PASS"
+    },
+    {
+      "name": "Detached fan does not activate or renumber the other fan",
+      "status": "PASS"
+    },
+    {
+      "name": "No global fan switch silently starts every fan",
       "status": "PASS"
     }
   ]
